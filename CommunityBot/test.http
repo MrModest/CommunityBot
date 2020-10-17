@@ -1,0 +1,6 @@
+POST https://localhost:5001/api/start-polling
+Content-Type: application/json
+
+{}
+
+###
