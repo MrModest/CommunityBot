@@ -26,7 +26,7 @@ namespace CommunityBot
                 .AddUpdateHandlers();
 
             services.AddSingleton<BotService>();
-            services.AddSingleton<IChatService, ChatService>();
+            services.AddSingleton<IChatRepository, ChatRepository>();
             services.AddSingleton<IMediaGroupService, MediaGroupService>();
             
             services.AddControllers();

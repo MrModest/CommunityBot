@@ -1,15 +1,16 @@
 using System;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using CommunityBot.Contracts;
-using CommunityBot.Helpers;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+
+using CommunityBot.Contracts;
+using CommunityBot.Helpers;
 
 namespace CommunityBot.Handlers
 {
@@ -17,34 +18,39 @@ namespace CommunityBot.Handlers
     {
         private const string CreatePostCommand = "event";
         
-        private readonly BotConfigurationOptions _options;
-        private readonly IChatService _chatService;
+        private readonly IChatRepository _chatRepository;
         private readonly IMediaGroupService _mediaGroupService;
 
         public RepostMessageUpdateHandler(
             ITelegramBotClient botClient,
-            ILogger<RepostMessageUpdateHandler> logger,
             IOptions<BotConfigurationOptions> options,
-            IChatService chatService,
-            IMediaGroupService mediaGroupService) : base(botClient, logger)
+            ILogger<RepostMessageUpdateHandler> logger,
+            IChatRepository chatRepository,
+            IMediaGroupService mediaGroupService) 
+            : base(botClient, options, logger)
         {
-            _options = options.Value;
-            _chatService = chatService;
+            _chatRepository = chatRepository;
             _mediaGroupService = mediaGroupService;
         }
         
         protected override UpdateType[] AllowedUpdates => new[] {UpdateType.Message};
 
+        protected override bool CanHandle(Update update)
+        {
+            return update.Message.GetFirstBotCommand()?.name == CreatePostCommand ||
+                   update.Message.GetMentionedUserNames().Any(u => u == Options.BotName);
+        }
+
         protected override async Task HandleUpdateInternalAsync(Update update)
         {
             Message? message = null;
             
-            if (update.Message.GetBotCommands().Any(bc => bc.name == CreatePostCommand))
+            if (update.Message.GetFirstBotCommand()?.name == CreatePostCommand)
             {
                 message = update.Message;
             }
 
-            if (update.Message.GetMentionedUserNames().Any(u => u == _options.BotName))
+            if (update.Message.GetMentionedUserNames().Any(u => u == Options.BotName))
             {
                 message = update.Message.ReplyToMessage;
             }
@@ -83,7 +89,7 @@ namespace CommunityBot.Handlers
         {
             var text = await PreparePost(message);
             
-            await BotClient.SendTextMessageAsync(_options.MainChannelId, text, ParseMode.MarkdownV2,
+            await BotClient.SendTextMessageAsync(Options.MainChannelId, text, ParseMode.MarkdownV2,
                 disableWebPagePreview: true,
                 replyMarkup: InlineKeyboardHelper.GetPostButtons());
         }
@@ -98,12 +104,12 @@ namespace CommunityBot.Handlers
                 {
                     var photo = message.Photo.OrderByDescending(ps => ps.FileSize).First().FileId;
                 
-                    await BotClient.SendPhotoAsync(_options.MainChannelId, photo, caption, ParseMode.MarkdownV2,
+                    await BotClient.SendPhotoAsync(Options.MainChannelId, photo, caption, ParseMode.MarkdownV2,
                         replyMarkup: InlineKeyboardHelper.GetPostButtons());
                     break;
                 }
                 case MessageType.Video:
-                    await BotClient.SendVideoAsync(_options.MainChannelId, message.Video.FileId,
+                    await BotClient.SendVideoAsync(Options.MainChannelId, message.Video.FileId,
                         replyMarkup: InlineKeyboardHelper.GetPostButtons());
                     break;
                 
@@ -115,26 +121,37 @@ namespace CommunityBot.Handlers
         private async Task SendMediaGroupPost(Message message)
         {
             var media = await _mediaGroupService.GetMediaByGroupId(message.MediaGroupId);
-            await BotClient.SendMediaGroupAsync(media, _options.MainChannelId);
+            await BotClient.SendMediaGroupAsync(media, Options.MainChannelId);
         }
 
         private async Task<string> PreparePost(Message message)
         {
             var post = new StringBuilder();
-            var postText = message.IsBotCommand() 
-                ? message.GetBotCommands().First().arg 
-                : message.Text;
+            var postText = message.GetFirstBotCommand()?.arg ?? message.Text;
             post.Append($"{postText}\n\n");
             post.Append($" — {message.From.GetMentionMdLink()}");
             
             if (!message.IsPrivate())
             {
-                var savedChat = await _chatService.GetSavedChat(message.Chat.Id);
-                post.Append($" из {savedChat.JoinLink.ToMdLink(savedChat.CustomName ?? savedChat.ExactName)}\n");
+                post.Append($" из {await GetChatLink(message.Chat)}\n");
                 post.Append($" — {message.GetPostLink().ToMdLink("Источник")}");
             }
             
             return post.ToString().EscapeMarkdown();
+        }
+
+        private async Task<string> GetChatLink(Chat chat)
+        {
+            if (!string.IsNullOrWhiteSpace(chat.Username))
+            {
+                return $"https://t.me/{chat.Username}".ToMdLink(chat.Title);
+            }
+            
+            var savedChat = await _chatRepository.GetByName(chat.Title);
+
+            return savedChat != null
+                ? savedChat.JoinLink.ToMdLink(savedChat.ExactName)
+                : $"«{chat.Title}»";
         }
     }
 }
