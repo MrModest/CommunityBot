@@ -6,6 +6,10 @@ namespace CommunityBot.Contracts
 {
     public interface IMediaGroupService
     {
-        Task<IEnumerable<IAlbumInputMedia>> GetMediaByGroupId(string mediaGroupId);
+        Task<IEnumerable<IAlbumInputMedia>?> GetMediaByGroupId(string mediaGroupId);
+
+        void AddMediaToGroup(string mediaGroupId, IAlbumInputMedia media);
+        
+        void ClearOldMediaGroups();
     }
 }
