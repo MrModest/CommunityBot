@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Chat = Telegram.Bot.Types.Chat;
 
 namespace CommunityBot.Handlers
 {

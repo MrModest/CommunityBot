@@ -11,6 +11,7 @@ using Telegram.Bot.Types.Enums;
 
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
+using Chat = Telegram.Bot.Types.Chat;
 
 namespace CommunityBot.Handlers
 {

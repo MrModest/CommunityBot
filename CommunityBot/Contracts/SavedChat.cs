@@ -9,7 +9,7 @@ namespace CommunityBot.Contracts
             JoinLink = joinLink;
         }
 
-        public long ChatId { get; set; }
+        public long ChatId { get; }
 
         public string ExactName { get; }
 

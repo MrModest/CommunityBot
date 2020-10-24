@@ -1,11 +1,12 @@
 using System;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using Newtonsoft.Json;
 
-namespace CommunityBot.Services
+namespace CommunityBot.Persistence
 {
     public class ChatRepository : IChatRepository
     {
