@@ -20,7 +20,7 @@ namespace CommunityBot.Services
         private bool _isStopPolling;
 
         public BotService(
-            ILogger logger,
+            ILogger<BotService> logger,
             ITelegramBotClient botClient,
             IEnumerable<IUpdateHandler> updateHandlers)
         {
