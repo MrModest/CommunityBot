@@ -6,7 +6,7 @@ namespace CommunityBot.Persistence
 {
     public class SqliteChatRepository : RepositoryBase<SavedChat>, IChatRepository
     {
-        public SqliteChatRepository(SQLiteConnection connection) : base(connection)
+        protected SqliteChatRepository(SQLiteConnection connection) : base(connection)
         {
         }
 
@@ -19,29 +19,7 @@ namespace CommunityBot.Persistence
         {
             await ExecuteAsync($"REMOVE FROM {TableName} where {nameof(SavedChat.ExactName)} = @name", new { name });
         }
-
-        public async Task<SavedChat?> GetById(long chatId)
-        {
-            return await ById(chatId);
-        }
-
-        public async Task Add(SavedChat savedChat)
-        {
-            await ExecuteAsync($"INSERT INTO {TableName}(" +
-                               $"{nameof(SavedChat.Id)}, {nameof(SavedChat.ExactName)}, {nameof(SavedChat.JoinLink)}) " +
-                               $"VALUES (@{nameof(SavedChat.Id)}, @{nameof(SavedChat.ExactName)}, @{nameof(SavedChat.JoinLink)})", savedChat);
-        }
-
-        public new async Task Update(SavedChat savedChat)
-        {
-            await base.Update(savedChat);
-        }
-
-        public async Task Remove(long id)
-        {
-            await DeleteById(id);
-        }
-
+        
         public async Task AddOrUpdate(SavedChat savedChat)
         {
             var existingEntity = await ById(savedChat.Id);
@@ -53,6 +31,18 @@ namespace CommunityBot.Persistence
             {
                 await Update(savedChat);
             }
+        }
+
+        private async Task Add(SavedChat savedChat)
+        {
+            await ExecuteAsync($"INSERT INTO {TableName}(" +
+                               $"{nameof(SavedChat.Id)}, {nameof(SavedChat.ExactName)}, {nameof(SavedChat.JoinLink)}) " +
+                               $"VALUES (@{nameof(SavedChat.Id)}, @{nameof(SavedChat.ExactName)}, @{nameof(SavedChat.JoinLink)})", savedChat);
+        }
+
+        private new async Task Update(SavedChat savedChat)
+        {
+            await base.Update(savedChat);
         }
     }
 }

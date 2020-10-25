@@ -8,14 +8,14 @@ using Dapper.Contrib.Extensions;
 
 namespace CommunityBot.Persistence
 {
-    public class RepositoryBase<TEntity> where TEntity : EntityBase, new()
+    public abstract class RepositoryBase<TEntity> where TEntity : EntityBase, new()
     {
         private readonly SQLiteConnection _connection;
 
         protected readonly string TableName =
             (Attribute.GetCustomAttribute(typeof(TEntity), typeof(TableAttribute)) as TableAttribute)!.Name;
 
-        public RepositoryBase(SQLiteConnection connection)
+        protected RepositoryBase(SQLiteConnection connection)
         {
             _connection = connection;
         }
@@ -35,7 +35,7 @@ namespace CommunityBot.Persistence
         protected async Task DeleteById(long id) =>
             await _connection.ExecuteAsync($"REMOVE FROM {TableName} WHERE Id = @id", new { id });
 
-    protected async Task ExecuteAsync(string query, object parameters) =>
-            await _connection.ExecuteAsync(query, parameters);
+        protected async Task ExecuteAsync(string query, object parameters) =>
+                await _connection.ExecuteAsync(query, parameters);
     }
 }
