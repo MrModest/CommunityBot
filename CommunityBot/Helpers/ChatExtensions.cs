@@ -1,7 +1,7 @@
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace CommunityBot.Handlers
+namespace CommunityBot.Helpers
 {
     public static class ChatExtensions
     {

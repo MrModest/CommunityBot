@@ -6,7 +6,6 @@ using Telegram.Bot.Types;
 
 namespace CommunityBot.Controllers
 {
-    [Route("api/")]
     public class UpdateController : ControllerBase
     {
         private readonly BotService _botService;
@@ -16,20 +15,20 @@ namespace CommunityBot.Controllers
             _botService = botService;
         }
 
-        [Route("")]
+        [HttpGet("")]
         public IActionResult Get()
         {
             return Ok("Please, use POST methods!");
         }
         
-        [HttpPost("web-hook")]
+        [HttpPost("api/web-hook")]
         public async Task<IActionResult> Post([FromBody]Update update)
         {
             await _botService.HandleUpdate(update);
             return Ok();
         }
         
-        [HttpPost("start-polling")]
+        [HttpPost("api/start-polling")]
         public async Task<IActionResult> StartPolling(int? timeoutMinute = null)
         {
             await _botService.StartPolling(timeoutMinute.HasValue
@@ -38,7 +37,7 @@ namespace CommunityBot.Controllers
             return Ok();
         }
         
-        [HttpPost("stop-polling")]
+        [HttpPost("api/stop-polling")]
         public IActionResult StopPolling()
         { 
             _botService.StopPolling();

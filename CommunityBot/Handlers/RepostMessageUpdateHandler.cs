@@ -103,7 +103,7 @@ namespace CommunityBot.Handlers
             {
                 case MessageType.Photo:
                 {
-                    var photo = message.Photo.OrderByDescending(ps => ps.FileSize).First().FileId;
+                    var photo = message.Photo.GetLargestPhotoSize().FileId;
                 
                     await BotClient.SendPhotoAsync(Options.MainChannelId, photo, caption, ParseMode.Html,
                         replyMarkup: InlineKeyboardHelper.GetPostButtons());
@@ -122,6 +122,13 @@ namespace CommunityBot.Handlers
         private async Task SendMediaGroupPost(Message message)
         {
             var media = await _mediaGroupService.GetMediaByGroupId(message.MediaGroupId);
+
+            if (media == null)
+            {
+                Logger.LogWarning("Post was not send because not found media group with id '{id}'", message.MediaGroupId);
+                return;
+            }
+            
             await BotClient.SendMediaGroupAsync(media, Options.MainChannelId);
         }
 

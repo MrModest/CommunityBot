@@ -23,7 +23,7 @@ namespace CommunityBot.Handlers
             ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options,
             IChatRepository chatRepository,
-            ILogger<UpdateHandlerBase> logger) 
+            ILogger<ChatManageUpdateHandler> logger) 
             : base(botClient, options, logger)
         {
             _chatRepository = chatRepository;
