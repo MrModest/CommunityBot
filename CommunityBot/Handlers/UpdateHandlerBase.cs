@@ -36,18 +36,37 @@ namespace CommunityBot.Handlers
 
         public async Task HandleUpdateAsync(Update update)
         {
-            Logger.LogInformation($"Start handler: '{HandlerName}' | {update.ToLog()}");
+            Logger.LogInformation("Start handler: '{handlerName}' | {update}", HandlerName, update.ToLog());
 
             if (AllowedUpdates.Contains(update.Type) && CanHandle(update))
             {
                await HandleUpdateInternalAsync(update);
             }
             
-            Logger.LogInformation($"End handler: '{HandlerName}'");
+            Logger.LogInformation("End handler: '{handlerName}'", HandlerName);
+        }
+
+        public async Task HandleErrorAsync(Exception exception, Update? update = null)
+        {
+            Logger.LogError("Caught exception in handler: '{handlerName}' | [{update}] | {exMessage} | {exStackTrace}", 
+                HandlerName, update?.ToLog(), exception.Message, exception.StackTrace);
+
+            await HandleErrorInternalAsync(exception, update);
         }
 
         protected abstract bool CanHandle(Update update);
         
         protected abstract Task HandleUpdateInternalAsync(Update update);
+
+        protected virtual async Task HandleErrorInternalAsync(Exception exception, Update? update = null)
+        {
+            Logger.LogWarning("Default handler was called in '{handlerName}'! [{update}]", HandlerName, update?.ToLog());
+
+            foreach (var debugInfoChatId in Options.DebugInfoChatIds)
+            {
+                await BotClient.SendTextMessageAsync(debugInfoChatId,
+                    $"Exception was throwed in handler '{HandlerName}':\n\n{exception.Message}\n\n{exception.StackTrace}");
+            }
+        }
     }
 }

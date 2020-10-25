@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -10,5 +11,7 @@ namespace CommunityBot.Contracts
         int OrderNumber { get; }
         
         Task HandleUpdateAsync(Update update);
+        
+        Task HandleErrorAsync(Exception exception, Update? update = null);
     }
 }
