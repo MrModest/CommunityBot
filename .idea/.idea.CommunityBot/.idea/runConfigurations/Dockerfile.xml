@@ -7,18 +7,6 @@
         <option name="command" value="" />
         <option name="containerName" value="community-tg-bot-container" />
         <option name="entrypoint" value="" />
-        <option name="envVars">
-          <list>
-            <DockerEnvVarImpl>
-              <option name="name" value="ASPNETCORE_URLS" />
-              <option name="value" value="https://+;http://+" />
-            </DockerEnvVarImpl>
-            <DockerEnvVarImpl>
-              <option name="name" value="ASPNETCORE_HTTPS_PORT" />
-              <option name="value" value="5001" />
-            </DockerEnvVarImpl>
-          </list>
-        </option>
         <option name="portBindings">
           <list>
             <DockerPortBindingImpl>
