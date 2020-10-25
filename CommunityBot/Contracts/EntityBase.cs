@@ -2,6 +2,6 @@
 {
     public abstract class EntityBase
     {
-        protected string Id { get; set; }
+        public long Id { get; set; }
     }
 }

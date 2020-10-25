@@ -36,9 +36,8 @@ namespace CommunityBot.Services
             updateReceiver.StartReceiving();
 
             await foreach (var update in updateReceiver.YieldUpdatesAsync())
-            {
+            { 
                 await HandleUpdate(update);
-                
                 if (_isStopPolling) { break; }
             }
         }
@@ -52,7 +51,14 @@ namespace CommunityBot.Services
         {
             foreach (var updateHandler in _updateHandlers.OrderByDescending(uh => uh.OrderNumber))
             {
-                await updateHandler.HandleUpdateAsync(update);
+                try
+                {
+                    await updateHandler.HandleUpdateAsync(update);
+                }
+                catch (Exception e)
+                {
+                    //ignore
+                }
             }
         }
     }

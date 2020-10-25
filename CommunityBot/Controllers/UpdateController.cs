@@ -22,16 +22,14 @@ namespace CommunityBot.Controllers
             return Ok("Please, use POST methods!");
         }
         
-        [Route("web-hook")]
-        [HttpPost]
+        [HttpPost("web-hook")]
         public async Task<IActionResult> Post([FromBody]Update update)
         {
             await _botService.HandleUpdate(update);
             return Ok();
         }
         
-        [Route("start-polling")]
-        [HttpPost]
+        [HttpPost("start-polling")]
         public async Task<IActionResult> StartPolling(int? timeoutMinute = null)
         {
             await _botService.StartPolling(timeoutMinute.HasValue
@@ -40,8 +38,7 @@ namespace CommunityBot.Controllers
             return Ok();
         }
         
-        [Route("stop-polling")]
-        [HttpPost]
+        [HttpPost("stop-polling")]
         public IActionResult StopPolling()
         { 
             _botService.StopPolling();

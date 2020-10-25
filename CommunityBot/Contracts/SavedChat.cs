@@ -1,18 +1,21 @@
 namespace CommunityBot.Contracts
 {
-    public class SavedChat
+    [Dapper.Contrib.Extensions.Table("SavedChats")]
+    public class SavedChat : EntityBase
     {
         public SavedChat(long chatId, string exactName, string joinLink)
         {
-            ChatId = chatId;
+            Id = chatId;
             ExactName = exactName;
             JoinLink = joinLink;
         }
 
-        public long ChatId { get; }
+        public SavedChat()
+        {
+            
+        }
 
         public string ExactName { get; }
-
         public string JoinLink { get; }
     }
 }

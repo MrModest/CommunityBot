@@ -8,9 +8,9 @@ namespace CommunityBot.Services
 {
     public class MediaGroupService : IMediaGroupService
     {
-        public async Task<IEnumerable<IAlbumInputMedia>> GetMediaByGroupId(string mediaGroupId)
+        public Task<IEnumerable<IAlbumInputMedia>> GetMediaByGroupId(string mediaGroupId)
         {
-            return Array.Empty<IAlbumInputMedia>();
+            return Task.FromResult<IEnumerable<IAlbumInputMedia>>(Array.Empty<IAlbumInputMedia>());
         }
     }
 }

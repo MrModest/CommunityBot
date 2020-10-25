@@ -4,49 +4,38 @@ using System.Data.SQLite;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace CommunityBot.Persistence
 {
-    internal class RepositoryBase<TEntity> where TEntity : EntityBase, new()
+    public class RepositoryBase<TEntity> where TEntity : EntityBase, new()
     {
         private readonly SQLiteConnection _connection;
-        protected readonly string TableName = (Attribute.GetCustomAttribute(typeof(TEntity), typeof(TableAttribute)) as TableAttribute)!.TableName;
+
+        protected readonly string TableName =
+            (Attribute.GetCustomAttribute(typeof(TEntity), typeof(TableAttribute)) as TableAttribute)!.Name;
 
         public RepositoryBase(SQLiteConnection connection)
         {
             _connection = connection;
         }
+
+        protected async Task<TEntity> ById(long id) =>
+            await _connection.GetAsync<TEntity>(id);
+
+        protected async Task<TEntity> GetSingle(string query, object parameters) =>
+            await _connection.QuerySingleOrDefaultAsync<TEntity>(query, parameters);
+
+        protected async Task<IEnumerable<TEntity>> GetList(string query, object parameters) =>
+            await _connection.QueryAsync<TEntity>(query, parameters);
         
-        protected async Task<TEntity> ById(string id)
-        {
-            return await _connection.QuerySingleOrDefaultAsync<TEntity>("select * from {tableName} where id = {id}", new { tableName = TableName, id });
-        }
+        protected async Task Update(TEntity entity) =>
+            await _connection.UpdateAsync(entity);
 
-        protected async Task<TEntity> GetSingle(string query, object parameters)
-        {
-            return await _connection.QuerySingleOrDefaultAsync<TEntity>(query, CreateQueryParams(parameters));
-        }
+        protected async Task DeleteById(long id) =>
+            await _connection.ExecuteAsync($"REMOVE FROM {TableName} WHERE Id = @id", new { id });
 
-        protected async Task<IEnumerable<TEntity>> GetList(string query, object parameters)
-        {
-            return await _connection.QueryAsync<TEntity>(query, CreateQueryParams(parameters));
-        }
-
-        protected async Task<IEnumerable<TEntity>> Insert(TEntity entity)
-        {
-            return await _connection.QueryAsync<TEntity>("insert into {tableName} name values {values}",
-                CreateQueryParams(entity));
-        }
-        
-        /// <summary>
-        /// Enriches parameters with params lite table name of db name
-        /// </summary>
-        /// <param name="parameters">object with query parameters</param>
-        /// <returns>enriched parameters object</returns>
-        private object CreateQueryParams(dynamic parameters)
-        {
-            parameters.tableName = TableName;
-            return parameters;
-        }
+    protected async Task ExecuteAsync(string query, object parameters) =>
+            await _connection.ExecuteAsync(query, parameters);
     }
 }

@@ -21,7 +21,8 @@ namespace CommunityBot.Helpers
         public static IServiceCollection AddUpdateHandlers(this IServiceCollection services)
         {
             services.AddSingleton<IUpdateHandler, RepostMessageUpdateHandler>();
-
+            services.AddSingleton<IUpdateHandler, InfoMessageUpdateHandler>();
+            services.AddSingleton<IUpdateHandler, ChatManageUpdateHandler>();
             return services;
         }
     }

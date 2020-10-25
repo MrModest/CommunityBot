@@ -1,5 +1,4 @@
 using System.Data.SQLite;
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,10 +27,8 @@ namespace CommunityBot
                 .AddTelegramBotClient()
                 .AddUpdateHandlers();
             
-            //todo add connection to DI container
-
             services.AddSingleton<BotService>();
-            services.AddSingleton<IChatRepository, ChatRepository>();
+            services.AddSingleton<IChatRepository, SqliteChatRepository>();
             services.AddSingleton<IMediaGroupService, MediaGroupService>();
             ConfigureDatabase(services);
             
@@ -57,13 +54,10 @@ namespace CommunityBot
         
         private static void ConfigureDatabase(IServiceCollection services)
         {
-            services.AddTransient(provider =>
+            services.AddSingleton(provider =>
             {
-                if (!File.Exists("file"))
-                {
-                    //todo
-                }
-                var connection = new SQLiteConnection("");
+                //todo use directory from docket volume
+                var connection = new SQLiteConnection("DataSource=\"C:/Users/gjmrd/projects/CommunityBot/database.sqlite\";");
                 connection.Open();
                 return connection;
             });
