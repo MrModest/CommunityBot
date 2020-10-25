@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Chat = Telegram.Bot.Types.Chat;
 
 namespace CommunityBot.Handlers
 {
@@ -102,6 +103,8 @@ namespace CommunityBot.Handlers
 
             if (string.IsNullOrWhiteSpace(inviteLink) && string.IsNullOrWhiteSpace(chat.InviteLink))
             {
+                //тут телега может поругаться что нет прав
+                //todo отдавать нормальный ответ
                 chat.InviteLink = await BotClient.ExportChatInviteLinkAsync(chat.Id);
 
                 if (string.IsNullOrWhiteSpace(chat.InviteLink))
@@ -130,7 +133,7 @@ namespace CommunityBot.Handlers
                 return;
             }
 
-            await _chatRepository.Remove(chatExactName);
+            await _chatRepository.RemoveByName(chatExactName);
 
             await SendMessage($"Если чат с названием {chatExactName} существовал в моём списке, то я его удалил.", replyToMessageId);
         }

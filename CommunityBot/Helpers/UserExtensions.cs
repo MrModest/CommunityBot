@@ -8,5 +8,10 @@ namespace CommunityBot.Helpers
         {
             return $"tg://user?id={user.Id}".ToMdLink(user.FirstName ?? user.Username);
         }
+
+        public static string GetMentionHtmlLink(this User user)
+        {
+            return $"tg://user?id={user.Id}".ToHtmlLink(user.FirstName ?? user.Username);
+        }
     }
 }
