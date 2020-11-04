@@ -24,14 +24,12 @@ namespace CommunityBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<BotConfigurationOptions>(Configuration.GetSection(BotConfigurationOptions.SectionName))
+                .Configure<SQLiteConfigurationOptions>(Configuration.GetSection(SQLiteConfigurationOptions.SectionName))
                 .AddTelegramBotClient()
-                .AddUpdateHandlers();
-            
-            services.AddSingleton<BotService>();
-            services.AddSingleton<IChatRepository, SqliteChatRepository>();
-            services.AddSingleton<IMediaGroupService, MediaGroupService>();
-            ConfigureDatabase(services);
-            
+                .AddUpdateHandlers()
+                .AddServices()
+                .AddSqliteDatabase();
+
             services.AddControllers();
         }
 
@@ -50,17 +48,6 @@ namespace CommunityBot
             //app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-        }
-        
-        private static void ConfigureDatabase(IServiceCollection services)
-        {
-            services.AddSingleton(provider =>
-            {
-                //todo use directory from docket volume
-                var connection = new SQLiteConnection("DataSource=\"C:/Users/gjmrd/projects/CommunityBot/database.sqlite\";");
-                connection.Open();
-                return connection;
-            });
         }
     }
 }

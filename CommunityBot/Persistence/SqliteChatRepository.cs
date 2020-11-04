@@ -25,24 +25,12 @@ namespace CommunityBot.Persistence
             var existingEntity = await ById(savedChat.Id);
             if (existingEntity is null)
             {
-                await Add(savedChat);
+                savedChat.Id = await Insert(savedChat);
             }
             else
             {
                 await Update(savedChat);
             }
-        }
-
-        private async Task Add(SavedChat savedChat)
-        {
-            await ExecuteAsync($"INSERT INTO {TableName}(" +
-                               $"{nameof(SavedChat.Id)}, {nameof(SavedChat.ExactName)}, {nameof(SavedChat.JoinLink)}) " +
-                               $"VALUES (@{nameof(SavedChat.Id)}, @{nameof(SavedChat.ExactName)}, @{nameof(SavedChat.JoinLink)})", savedChat);
-        }
-
-        private new async Task Update(SavedChat savedChat)
-        {
-            await base.Update(savedChat);
         }
     }
 }

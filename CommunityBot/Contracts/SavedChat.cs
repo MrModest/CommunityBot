@@ -5,7 +5,7 @@ namespace CommunityBot.Contracts
     {
         public SavedChat(long chatId, string exactName, string joinLink)
         {
-            Id = chatId;
+            ChatId = chatId;
             ExactName = exactName;
             JoinLink = joinLink;
         }
@@ -15,6 +15,7 @@ namespace CommunityBot.Contracts
             
         }
 
+        public long ChatId { get; }
         public string ExactName { get; }
         public string JoinLink { get; }
     }

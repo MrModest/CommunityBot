@@ -28,6 +28,9 @@ namespace CommunityBot.Persistence
 
         protected async Task<IEnumerable<TEntity>> GetList(string query, object parameters) =>
             await _connection.QueryAsync<TEntity>(query, parameters);
+
+        protected async Task<long> Insert(TEntity entity) =>
+            await _connection.InsertAsync(entity);
         
         protected async Task Update(TEntity entity) =>
             await _connection.UpdateAsync(entity);

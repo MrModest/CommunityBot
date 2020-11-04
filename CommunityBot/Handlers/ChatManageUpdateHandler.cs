@@ -103,9 +103,14 @@ namespace CommunityBot.Handlers
 
             if (string.IsNullOrWhiteSpace(inviteLink) && string.IsNullOrWhiteSpace(chat.InviteLink))
             {
-                //тут телега может поругаться что нет прав
-                //todo отдавать нормальный ответ
-                chat.InviteLink = await BotClient.ExportChatInviteLinkAsync(chat.Id);
+                try
+                {
+                    chat.InviteLink = await BotClient.ExportChatInviteLinkAsync(chat.Id);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogWarning("Can't get invite link for chat {chatId}! [ExMessage: {exMessage}, StackTrace: {stackTrace}]", chat.Id, e.Message, e.StackTrace);
+                }
 
                 if (string.IsNullOrWhiteSpace(chat.InviteLink))
                 {
