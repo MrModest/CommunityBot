@@ -1,44 +1,40 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
+using Microsoft.Extensions.Caching.Memory;
 using Telegram.Bot.Types;
 
 namespace CommunityBot.Services
 {
     public class MediaGroupService : IMediaGroupService
     {
-        private static readonly ConcurrentDictionary<string, (DateTime createDate, ConcurrentBag<IAlbumInputMedia> medias)> MediaGroups = new ConcurrentDictionary<string, (DateTime createDate, ConcurrentBag<IAlbumInputMedia> medias)>();
+        private readonly IMemoryCache _memoryCache;
+        
+        public MediaGroupService(
+            IMemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
+        }
 
         public void AddMediaToGroup(string mediaGroupId, IAlbumInputMedia media)
         {
-            MediaGroups.AddOrUpdate(mediaGroupId,
-                id => (DateTime.Now, new ConcurrentBag<IAlbumInputMedia> {media}), 
-                (id, medias) =>
-                {
-                    medias.medias.Add(media);
-                    return medias;
-                });
-        }
-
-        public void ClearOldMediaGroups()
-        {
-            var now = DateTime.Now;
-            
-            foreach (var (mediaGroupId, medias) in MediaGroups)
+            if (_memoryCache.TryGetValue(mediaGroupId, out ConcurrentBag<IAlbumInputMedia> entry))
             {
-                if (now - medias.createDate > TimeSpan.FromDays(1))
-                {
-                    MediaGroups.TryRemove(mediaGroupId, out _);
-                }
+                entry.Add(media);
+            }
+            else
+            {
+                _memoryCache.Set(mediaGroupId, new ConcurrentBag<IAlbumInputMedia> {media}, TimeSpan.FromDays(1));
             }
         }
-        
+
         public async Task<IEnumerable<IAlbumInputMedia>?> GetMediaByGroupId(string mediaGroupId)
         {
-            return MediaGroups.TryGetValue(mediaGroupId, out var medias) 
-                ? medias.medias
+            return _memoryCache.TryGetValue(mediaGroupId, out ConcurrentBag<IAlbumInputMedia> entry)
+                ? entry.ToArray()
                 : null;
         }
     }

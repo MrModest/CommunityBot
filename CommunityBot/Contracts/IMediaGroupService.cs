@@ -9,7 +9,5 @@ namespace CommunityBot.Contracts
         Task<IEnumerable<IAlbumInputMedia>?> GetMediaByGroupId(string mediaGroupId);
 
         void AddMediaToGroup(string mediaGroupId, IAlbumInputMedia media);
-        
-        void ClearOldMediaGroups();
     }
 }
