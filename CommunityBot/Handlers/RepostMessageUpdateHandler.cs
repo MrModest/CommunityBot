@@ -74,7 +74,7 @@ namespace CommunityBot.Handlers
                     break;
                 case MessageType.Photo:
                 case MessageType.Video:
-                    if (string.IsNullOrWhiteSpace(message.MediaGroupId))
+                    if (message.MediaGroupId.IsBlank())
                     {
                         await SendPhotoVideoPost(message);    
                     }
@@ -145,12 +145,12 @@ namespace CommunityBot.Handlers
                 post.Append($" — {message.GetPostLink().ToHtmlLink("Источник")}");
             }
             
-            return post.ToString().EscapeMarkdown();
+            return post.ToString().EscapeHtml();
         }
 
         private async Task<string> GetChatLink(Chat chat)
         {
-            if (!string.IsNullOrWhiteSpace(chat.Username))
+            if (chat.Username.IsNotBlank())
             {
                 return $"https://t.me/{chat.Username}".ToHtmlLink(chat.Title);
             }

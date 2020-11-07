@@ -48,7 +48,7 @@ namespace CommunityBot.Handlers
             var command = update.Message.GetFirstBotCommand();
             return command.HasValue &&
                    infoDict.Keys.Contains(command.Value.name) &&
-                   string.IsNullOrWhiteSpace(command.Value.arg);
+                   command.Value.arg.IsBlank();
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)

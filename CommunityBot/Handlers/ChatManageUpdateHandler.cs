@@ -101,7 +101,7 @@ namespace CommunityBot.Handlers
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(inviteLink) && string.IsNullOrWhiteSpace(chat.InviteLink))
+            if (inviteLink.IsBlank() && chat.InviteLink.IsBlank())
             {
                 try
                 {
@@ -112,7 +112,7 @@ namespace CommunityBot.Handlers
                     Logger.LogWarning("Can't get invite link for chat {chatId}! [ExMessage: {exMessage}, StackTrace: {stackTrace}]", chat.Id, e.Message, e.StackTrace);
                 }
 
-                if (string.IsNullOrWhiteSpace(chat.InviteLink))
+                if (chat.InviteLink.IsBlank())
                 {
                     await SendMessage("Или дайте мне ссылку-приглашение вместе с коммандой, или сделайте админом, чтобы я сам мог создать её.", replyToMessageId);
                     return;
@@ -132,7 +132,7 @@ namespace CommunityBot.Handlers
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(chatExactName))
+            if (chatExactName.IsBlank())
             {
                 await SendMessage("Напиши рядом с командой полное имя чата, который удаляем.", replyToMessageId);
                 return;

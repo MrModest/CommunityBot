@@ -27,10 +27,10 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return !string.IsNullOrWhiteSpace(update.Message.MediaGroupId);
+            return update.Message.MediaGroupId.IsNotBlank();
         }
 
-        protected override async Task HandleUpdateInternalAsync(Update update)
+        protected override Task HandleUpdateInternalAsync(Update update)
         {
             IAlbumInputMedia? media = update.Message.Type switch
             {
@@ -45,6 +45,8 @@ namespace CommunityBot.Handlers
             }
             
             Logger.LogWarning("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
+            
+            return Task.CompletedTask;
         }
     }
 }
