@@ -38,7 +38,9 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return update.Message.GetFirstBotCommand()?.name == CreatePostCommand ||
+            var command = update.Message.GetFirstBotCommand();
+            
+            return command.HasValue && command.Value.name == CreatePostCommand && command.Value.arg.IsNotBlank() ||
                    update.Message.GetMentionedUserNames().Any(u => u == Options.BotName);
         }
 
@@ -91,8 +93,7 @@ namespace CommunityBot.Handlers
             var text = await PreparePost(message);
             
             await BotClient.SendTextMessageAsync(Options.MainChannelId, text, ParseMode.Html,
-                disableWebPagePreview: true,
-                replyMarkup: InlineKeyboardHelper.GetPostButtons());
+                disableWebPagePreview: true);
         }
 
         private async Task SendPhotoVideoPost(Message message)
@@ -105,13 +106,11 @@ namespace CommunityBot.Handlers
                 {
                     var photo = message.Photo.GetLargestPhotoSize().FileId;
                 
-                    await BotClient.SendPhotoAsync(Options.MainChannelId, photo, caption, ParseMode.Html,
-                        replyMarkup: InlineKeyboardHelper.GetPostButtons());
+                    await BotClient.SendPhotoAsync(Options.MainChannelId, photo, caption, ParseMode.Html);
                     break;
                 }
                 case MessageType.Video:
-                    await BotClient.SendVideoAsync(Options.MainChannelId, message.Video.FileId,
-                        replyMarkup: InlineKeyboardHelper.GetPostButtons());
+                    await BotClient.SendVideoAsync(Options.MainChannelId, message.Video.FileId, caption: caption, parseMode: ParseMode.Html);
                     break;
                 
                 default:
@@ -128,6 +127,12 @@ namespace CommunityBot.Handlers
                 Logger.LogWarning("Post was not send because not found media group with id '{id}'", message.MediaGroupId);
                 return;
             }
+
+            foreach (var inputMedia in media.Where(m => m.Caption != null).OfType<InputMediaBase>())
+            {
+                message.Text = inputMedia.Caption;
+                inputMedia.Caption = await PreparePost(message);
+            }
             
             await BotClient.SendMediaGroupAsync(media, Options.MainChannelId);
         }
@@ -135,7 +140,7 @@ namespace CommunityBot.Handlers
         private async Task<string> PreparePost(Message message)
         {
             var post = new StringBuilder();
-            var postText = message.GetFirstBotCommand()?.arg ?? message.Text;
+            var postText = message.GetFirstBotCommand()?.arg ?? message.Text ?? message.Caption;
             post.Append($"{postText}\n\n");
             post.Append($" — {message.From.GetMentionHtmlLink()}");
             
@@ -145,7 +150,7 @@ namespace CommunityBot.Handlers
                 post.Append($" — {message.GetPostLink().ToHtmlLink("Источник")}");
             }
             
-            return post.ToString().EscapeHtml();
+            return post.ToString();
         }
 
         private async Task<string> GetChatLink(Chat chat)

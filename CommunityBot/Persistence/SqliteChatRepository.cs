@@ -6,7 +6,8 @@ namespace CommunityBot.Persistence
 {
     public class SqliteChatRepository : RepositoryBase<SavedChat>, IChatRepository
     {
-        protected SqliteChatRepository(SQLiteConnection connection) : base(connection)
+        public SqliteChatRepository(SQLiteConnection connection) 
+            : base(connection)
         {
         }
 

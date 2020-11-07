@@ -28,7 +28,8 @@ namespace CommunityBot.Helpers
             return services
                 .AddSingleton<IUpdateHandler, RepostMessageUpdateHandler>()
                 .AddSingleton<IUpdateHandler, InfoMessageUpdateHandler>()
-                .AddSingleton<IUpdateHandler, ChatManageUpdateHandler>();
+                .AddSingleton<IUpdateHandler, ChatManageUpdateHandler>()
+                .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>();
         }
         
         public static IServiceCollection AddServices(this IServiceCollection services)
@@ -64,7 +65,7 @@ namespace CommunityBot.Helpers
             {
                 if (tableName == "SavedChats")
                 {
-                    connection.Execute("CREATE TABLE IF NOT EXISTS main.SavedChats (Id INT PRIMARY KEY, ExactName TEXT NOT NULL, JoinLink TEXT DEFAULT NULL);");
+                    connection.Execute("CREATE TABLE IF NOT EXISTS main.SavedChats (Id INT PRIMARY KEY, ChatId INT DEFAULT NULL, ExactName TEXT NOT NULL, JoinLink TEXT DEFAULT NULL);");
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.ExactName_desc ON SavedChats (ExactName DESC);");
                 }
             }

@@ -36,12 +36,15 @@ namespace CommunityBot.Handlers
 
         public async Task HandleUpdateAsync(Update update)
         {
+            if (!AllowedUpdates.Contains(update.Type) || !CanHandle(update))
+            {
+                Logger.LogInformation("Can't handle with '{handlerName}' | {update}", HandlerName, update.ToLog());
+                return;
+            }
+            
             Logger.LogInformation("Start handler: '{handlerName}' | {update}", HandlerName, update.ToLog());
 
-            if (AllowedUpdates.Contains(update.Type) && CanHandle(update))
-            {
-               await HandleUpdateInternalAsync(update);
-            }
+            await HandleUpdateInternalAsync(update);
             
             Logger.LogInformation("End handler: '{handlerName}'", HandlerName);
         }

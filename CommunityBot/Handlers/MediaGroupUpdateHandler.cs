@@ -32,12 +32,7 @@ namespace CommunityBot.Handlers
 
         protected override Task HandleUpdateInternalAsync(Update update)
         {
-            IAlbumInputMedia? media = update.Message.Type switch
-            {
-                MessageType.Photo => update.Message.Photo.ToInputMedia(),
-                MessageType.Video => update.Message.Video.ToInputMedia(),
-                _ => null
-            };
+            var media = update.Message.ToInputMedia();
 
             if (media != null)
             {

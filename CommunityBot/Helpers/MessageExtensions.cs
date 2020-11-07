@@ -62,5 +62,31 @@ namespace CommunityBot.Helpers
                 .ToArray()
                    ?? new string[0];
         }
+
+        public static IAlbumInputMedia? ToInputMedia(this Message message)
+        {
+            switch (message.Type)
+            {
+                case MessageType.Photo:
+                    var photo = new InputMediaPhoto(message.Photo.GetLargestPhotoSize().FileId);
+                    photo.Caption = message.Caption;
+                    photo.ParseMode = ParseMode.Html;
+                    return photo;
+                
+                case MessageType.Video:
+                    var video = new InputMediaVideo(message.Video.FileId);
+                    video.Caption = message.Caption;
+                    video.ParseMode = ParseMode.Html;
+                    return video;
+                
+                default:
+                    return null;
+            }
+        }
+        
+        public static InputMediaVideo ToInputMedia(this Video video)
+        {
+            return new InputMediaVideo(video.FileId);
+        }
     }
 }

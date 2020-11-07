@@ -10,17 +10,5 @@ namespace CommunityBot.Helpers
         {
             return photoSizes.OrderByDescending(ps => ps.FileSize).First();
         }
-
-        public static InputMediaPhoto ToInputMedia(this IEnumerable<PhotoSize> photoSizes)
-        {
-            var fileId = photoSizes.GetLargestPhotoSize().FileId;
-            
-            return new InputMediaPhoto(fileId);
-        }
-        
-        public static InputMediaVideo ToInputMedia(this Video video)
-        {
-            return new InputMediaVideo(video.FileId);
-        }
     }
 }

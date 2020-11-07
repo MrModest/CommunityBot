@@ -19,6 +19,9 @@ namespace CommunityBot.Persistence
         {
             _connection = connection;
         }
+        
+        protected async Task<IEnumerable<TEntity>> GetAll() =>
+            await _connection.GetAllAsync<TEntity>();
 
         protected async Task<TEntity> ById(long id) =>
             await _connection.GetAsync<TEntity>(id);

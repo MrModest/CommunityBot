@@ -51,13 +51,14 @@ namespace CommunityBot.Handlers
                    command.Value.arg.IsBlank();
         }
 
+        //ToDo: may be need change concept (/help <commandName>) and don't touch command with empty args
         protected override async Task HandleUpdateInternalAsync(Update update)
         {
             var command = update.Message.GetFirstBotCommand();
 
             if (infoDict.TryGetValue(command?.name ?? string.Empty, out var text))
             {
-                await BotClient.SendTextMessageAsync(Options.MainChannelId, text, ParseMode.Html);
+                await BotClient.SendTextMessageAsync(update.Message.Chat.Id, text, ParseMode.Html, replyToMessageId: update.Message.MessageId);
                 return;
             }
                 
