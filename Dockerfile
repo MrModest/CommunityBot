@@ -19,6 +19,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+ENV SQLite__DbFilePath /app/db/database.sqlite
+
 ENV ASPNETCORE_URLS https://+;http://+
 ENV ASPNETCORE_HTTPS_PORT 5001
 
