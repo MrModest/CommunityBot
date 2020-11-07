@@ -121,7 +121,7 @@ namespace CommunityBot.Handlers
 
         private async Task SendMediaGroupPost(Message message)
         {
-            var media = await _mediaGroupService.GetMediaByGroupId(message.MediaGroupId);
+            var media = _mediaGroupService.GetMediaByGroupId(message.MediaGroupId);
 
             if (media == null)
             {

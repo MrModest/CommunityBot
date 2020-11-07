@@ -31,7 +31,7 @@ namespace CommunityBot.Services
             }
         }
 
-        public async Task<IEnumerable<IAlbumInputMedia>?> GetMediaByGroupId(string mediaGroupId)
+        public IEnumerable<IAlbumInputMedia>? GetMediaByGroupId(string mediaGroupId)
         {
             return _memoryCache.TryGetValue(mediaGroupId, out ConcurrentBag<IAlbumInputMedia> entry)
                 ? entry.ToArray()

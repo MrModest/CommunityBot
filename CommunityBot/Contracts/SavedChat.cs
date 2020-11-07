@@ -10,6 +10,7 @@ namespace CommunityBot.Contracts
             JoinLink = joinLink;
         }
 
+        //For Dapper
         public SavedChat()
         {
             

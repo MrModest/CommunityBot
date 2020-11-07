@@ -43,6 +43,8 @@ namespace CommunityBot.Handlers
             {
                 _mediaGroupService.AddMediaToGroup(update.Message.MediaGroupId, media);
             }
+            
+            Logger.LogWarning("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
         }
     }
 }
