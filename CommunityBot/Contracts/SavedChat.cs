@@ -11,7 +11,9 @@ namespace CommunityBot.Contracts
         }
 
         //For Dapper
+#pragma warning disable 8618
         public SavedChat()
+#pragma warning restore 8618
         {
             
         }
