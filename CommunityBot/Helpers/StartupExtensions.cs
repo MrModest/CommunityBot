@@ -74,9 +74,8 @@ namespace CommunityBot.Helpers
                     debugInfoChatId.ToString(),
                     minimumLevel: LogEventLevel.Warning);
             }
-            var logger = loggerConfiguration.CreateLogger();
 
-            loggingBuilder.AddSerilog(logger);
+            loggingBuilder.AddSerilog(loggerConfiguration.CreateLogger());
         }
 
         private static void EnsureDatabase(SQLiteConnection connection)
