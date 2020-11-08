@@ -5,10 +5,9 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace CommunityBot.Handlers
 {
@@ -35,7 +34,7 @@ namespace CommunityBot.Handlers
         public InfoMessageUpdateHandler(
             ITelegramBotClient botClient,
             IOptions<BotConfigurationOptions> options,
-            ILogger logger) 
+            ILogger<InfoMessageUpdateHandler> logger) 
             : base(botClient, options, logger)
         {
         }
@@ -61,7 +60,7 @@ namespace CommunityBot.Handlers
                 return;
             }
                 
-            Logger.Information($"Command {command?.name} was skipped because not found in infoDict.");
+            Logger.LogInformation($"Command {command?.name} was skipped because not found in infoDict.");
         }
     }
 }

@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -37,20 +37,20 @@ namespace CommunityBot.Handlers
         {
             if (!AllowedUpdates.Contains(update.Type) || !CanHandle(update))
             {
-                Logger.Information("Can't handle with '{handlerName}' | {update}", HandlerName, update.ToLog());
+                Logger.LogInformation("Can't handle with '{handlerName}' | {update}", HandlerName, update.ToLog());
                 return;
             }
             
-            Logger.Information("Start handler: '{handlerName}' | {update}", HandlerName, update.ToLog());
+            Logger.LogInformation("Start handler: '{handlerName}' | {update}", HandlerName, update.ToLog());
 
             await HandleUpdateInternalAsync(update);
             
-            Logger.Information("End handler: '{handlerName}'", HandlerName);
+            Logger.LogInformation("End handler: '{handlerName}'", HandlerName);
         }
 
         public async Task HandleErrorAsync(Exception exception, Update? update = null)
         {
-            Logger.Error("Caught exception in handler: '{handlerName}' | [{update}] | {exMessage} | {exStackTrace}", 
+            Logger.LogError("Caught exception in handler: '{handlerName}' | [{update}] | {exMessage} | {exStackTrace}", 
                 HandlerName, update?.ToLog(), exception.Message, exception.StackTrace);
 
             await HandleErrorInternalAsync(exception, update);
@@ -62,7 +62,7 @@ namespace CommunityBot.Handlers
 
         protected virtual async Task HandleErrorInternalAsync(Exception exception, Update? update = null)
         {
-            Logger.Warning("Default handler was called in '{handlerName}'! [{update}]", HandlerName, update?.ToLog());
+            Logger.LogWarning("Default handler was called in '{handlerName}'! [{update}]", HandlerName, update?.ToLog());
 
             foreach (var debugInfoChatId in Options.DebugInfoChatIds)
             {

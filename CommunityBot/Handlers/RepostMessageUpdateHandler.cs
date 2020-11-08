@@ -9,7 +9,7 @@ using Telegram.Bot.Types.Enums;
 
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Chat = Telegram.Bot.Types.Chat;
 
 namespace CommunityBot.Handlers
@@ -24,7 +24,7 @@ namespace CommunityBot.Handlers
         public RepostMessageUpdateHandler(
             ITelegramBotClient botClient,
             IOptions<BotConfigurationOptions> options,
-            ILogger logger,
+            ILogger<RepostMessageUpdateHandler> logger,
             IChatRepository chatRepository,
             IMediaGroupService mediaGroupService) 
             : base(botClient, options, logger)
@@ -63,7 +63,7 @@ namespace CommunityBot.Handlers
                 return;
             }
             
-            Logger.Information($"Update {update.ToLog()} was skipped!");
+            Logger.LogInformation($"Update {update.ToLog()} was skipped!");
         }
 
         private async Task SendPost(Message message)
@@ -123,7 +123,7 @@ namespace CommunityBot.Handlers
 
             if (media == null)
             {
-                Logger.Warning("Post was not send because not found media group with id '{id}'", message.MediaGroupId);
+                Logger.LogWarning("Post was not send because not found media group with id '{id}'", message.MediaGroupId);
                 return;
             }
 

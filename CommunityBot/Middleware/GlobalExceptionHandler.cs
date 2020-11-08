@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace CommunityBot.Middleware
 {
     public class GlobalExceptionHandler
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger _logger;
+        private readonly ILogger<GlobalExceptionHandler> _logger;
 
-        public GlobalExceptionHandler(RequestDelegate next, ILogger logger)
+        public GlobalExceptionHandler(RequestDelegate next, ILogger<GlobalExceptionHandler> logger)
         {
             _next = next;
             _logger = logger;
@@ -24,7 +24,7 @@ namespace CommunityBot.Middleware
             }
             catch (Exception e)
             {
-                _logger.Error($"Caught exception:\n\"{e.Message}\"\n{e.StackTrace}");
+                _logger.LogError($"Caught exception:\n\"{e.Message}\"\n{e.StackTrace}");
             }
         }
     }

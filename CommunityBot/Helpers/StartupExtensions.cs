@@ -7,6 +7,8 @@ using CommunityBot.Services;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
@@ -59,25 +61,22 @@ namespace CommunityBot.Helpers
             });
         }
 
-        public static IServiceCollection AddLogger(this IServiceCollection services)
-        {
-            return services.AddTransient<ILogger>(provider =>
-            {
-                var configuration = provider.GetService<IConfiguration>();
-                var botConfigurationOptions = provider.GetService<IOptions<BotConfigurationOptions>>();
-                
-                var loggerConfiguration = new LoggerConfiguration();
-                var config = loggerConfiguration.WriteTo.File(configuration.GetSection("Logging:FilePath").Value);
+        public static void ConfigureSerilog(HostBuilderContext hostBuilderContext, ILoggingBuilder loggingBuilder)
+        {    
+            var configuration = hostBuilderContext.Configuration;
+            var loggerConfiguration = new LoggerConfiguration();
+            loggerConfiguration = loggerConfiguration.WriteTo.File(configuration.GetSection("Logging:FilePath").Value);
 
-                foreach (var debugInfoChatId in botConfigurationOptions.Value.DebugInfoChatIds)
-                {
-                    config = config.WriteTo.TeleSink(
-                        botConfigurationOptions.Value.BotToken,
-                        debugInfoChatId.ToString(),
-                        minimumLevel: LogEventLevel.Warning);
-                }
-                return config.CreateLogger();
-            });
+            foreach (var debugInfoChatId in configuration.GetSection("BotConfiguration:DebugInfoChatIds").Get<long[]>())
+            {
+                loggerConfiguration = loggerConfiguration.WriteTo.TeleSink(
+                    configuration.GetSection("BotConfiguration:BotToken").Value,
+                    debugInfoChatId.ToString(),
+                    minimumLevel: LogEventLevel.Warning);
+            }
+            var logger = loggerConfiguration.CreateLogger();
+
+            loggingBuilder.AddSerilog(logger);
         }
 
         private static void EnsureDatabase(SQLiteConnection connection)

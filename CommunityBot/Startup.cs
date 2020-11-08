@@ -27,7 +27,6 @@ namespace CommunityBot
                 .AddSqliteDatabase()
                 .AddTelegramBotClient()
                 .AddUpdateHandlers()
-                .AddLogger()
                 .AddServices();
 
             services.AddControllers();

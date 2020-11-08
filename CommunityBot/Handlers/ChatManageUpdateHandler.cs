@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -25,7 +25,7 @@ namespace CommunityBot.Handlers
             ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options,
             IChatRepository chatRepository,
-            ILogger logger) 
+            ILogger<ChatManageUpdateHandler> logger) 
             : base(botClient, options, logger)
         {
             _chatRepository = chatRepository;
@@ -120,7 +120,7 @@ namespace CommunityBot.Handlers
                 }
                 catch (ApiRequestException e)
                 {
-                    Logger.Warning("Can't get invite link for chat {chatId}! [ExMessage: {exMessage}, StackTrace: {stackTrace}]", chat.Id, e.Message, e.StackTrace);
+                    Logger.LogWarning("Can't get invite link for chat {chatId}! [ExMessage: {exMessage}, StackTrace: {stackTrace}]", chat.Id, e.Message, e.StackTrace);
                 }
 
                 if (chat.InviteLink.IsBlank())
