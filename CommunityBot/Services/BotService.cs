@@ -41,7 +41,6 @@ namespace CommunityBot.Services
             updateReceiver.StartReceiving();
             
             _logger.Information("Polling started!");
-            throw new Exception("test exception");
 
             await foreach (var update in updateReceiver.YieldUpdatesAsync())
             {
