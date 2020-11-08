@@ -5,9 +5,15 @@ using CommunityBot.Handlers;
 using CommunityBot.Persistence;
 using CommunityBot.Services;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
 using Telegram.Bot;
+using TelegramSink;
 
 namespace CommunityBot.Helpers
 {
@@ -53,6 +59,28 @@ namespace CommunityBot.Helpers
                 
                 return connection;
             });
+        }
+
+        public static void ConfigureSerilog(HostBuilderContext hostBuilderContext, ILoggingBuilder loggingBuilder)
+        {    
+            var configuration = hostBuilderContext.Configuration;
+            var loggerConfiguration = new LoggerConfiguration();
+            
+            loggerConfiguration = loggerConfiguration
+                .WriteTo
+                .File(configuration.GetSection("Logging:FilePath").Value);
+
+            var telegramApiKey = configuration.GetSection("BotConfiguration:BotToken").Value;
+            var debugInfoChatIds = configuration.GetSection("BotConfiguration:DebugInfoChatIds").Get<long[]>();
+            foreach (var debugInfoChatId in debugInfoChatIds)
+            {
+                loggerConfiguration = loggerConfiguration.WriteTo.TeleSink(
+                    telegramApiKey,
+                    debugInfoChatId.ToString(),
+                    minimumLevel: LogEventLevel.Warning);
+            }
+
+            loggingBuilder.AddSerilog(loggerConfiguration.CreateLogger());
         }
 
         private static void EnsureDatabase(SQLiteConnection connection)

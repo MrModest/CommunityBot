@@ -1,4 +1,3 @@
-using System.Data.SQLite;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,8 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
-using CommunityBot.Persistence;
-using CommunityBot.Services;
+using CommunityBot.Middleware;
 
 namespace CommunityBot
 {
@@ -43,8 +41,8 @@ namespace CommunityBot
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
+            app.UseMiddleware<GlobalExceptionHandler>();
 
             //app.UseAuthorization();
 

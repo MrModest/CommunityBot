@@ -13,7 +13,7 @@ namespace CommunityBot.Services
 {
     public class BotService
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<BotService> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IEnumerable<IUpdateHandler> _updateHandlers;
 
@@ -41,7 +41,7 @@ namespace CommunityBot.Services
             updateReceiver.StartReceiving();
             
             _logger.LogInformation("Polling started!");
-
+            
             await foreach (var update in updateReceiver.YieldUpdatesAsync())
             {
                 await HandleUpdate(update);
