@@ -65,12 +65,17 @@ namespace CommunityBot.Helpers
         {    
             var configuration = hostBuilderContext.Configuration;
             var loggerConfiguration = new LoggerConfiguration();
-            loggerConfiguration = loggerConfiguration.WriteTo.File(configuration.GetSection("Logging:FilePath").Value);
+            
+            loggerConfiguration = loggerConfiguration
+                .WriteTo
+                .File(configuration.GetSection("Logging:FilePath").Value);
 
-            foreach (var debugInfoChatId in configuration.GetSection("BotConfiguration:DebugInfoChatIds").Get<long[]>())
+            var telegramApiKey = configuration.GetSection("BotConfiguration:BotToken").Value;
+            var debugInfoChatIds = configuration.GetSection("BotConfiguration:DebugInfoChatIds").Get<long[]>();
+            foreach (var debugInfoChatId in debugInfoChatIds)
             {
                 loggerConfiguration = loggerConfiguration.WriteTo.TeleSink(
-                    configuration.GetSection("BotConfiguration:BotToken").Value,
+                    telegramApiKey,
                     debugInfoChatId.ToString(),
                     minimumLevel: LogEventLevel.Warning);
             }
