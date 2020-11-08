@@ -5,9 +5,13 @@ using CommunityBot.Handlers;
 using CommunityBot.Persistence;
 using CommunityBot.Services;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
 using Telegram.Bot;
+using TelegramSink;
 
 namespace CommunityBot.Helpers
 {
@@ -52,6 +56,27 @@ namespace CommunityBot.Helpers
                 EnsureDatabase(connection);
                 
                 return connection;
+            });
+        }
+
+        public static IServiceCollection AddLogger(this IServiceCollection services)
+        {
+            return services.AddTransient<ILogger>(provider =>
+            {
+                var configuration = provider.GetService<IConfiguration>();
+                var botConfigurationOptions = provider.GetService<IOptions<BotConfigurationOptions>>();
+                
+                var loggerConfiguration = new LoggerConfiguration();
+                var config = loggerConfiguration.WriteTo.File(configuration.GetSection("Logging:FilePath").Value);
+
+                foreach (var debugInfoChatId in botConfigurationOptions.Value.DebugInfoChatIds)
+                {
+                    config = config.WriteTo.TeleSink(
+                        botConfigurationOptions.Value.BotToken,
+                        debugInfoChatId.ToString(),
+                        minimumLevel: LogEventLevel.Warning);
+                }
+                return config.CreateLogger();
             });
         }
 

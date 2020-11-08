@@ -1,9 +1,8 @@
-using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -17,7 +16,7 @@ namespace CommunityBot.Handlers
         public MediaGroupUpdateHandler(
             ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options, 
-            ILogger<MediaGroupUpdateHandler> logger,
+            ILogger logger,
             IMediaGroupService mediaGroupService) : base(botClient, options, logger)
         {
             _mediaGroupService = mediaGroupService;
@@ -39,7 +38,7 @@ namespace CommunityBot.Handlers
                 _mediaGroupService.AddMediaToGroup(update.Message.MediaGroupId, media);
             }
             
-            Logger.LogWarning("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
+            Logger.Information("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
             
             return Task.CompletedTask;
         }

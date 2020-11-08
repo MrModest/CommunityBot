@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Helpers;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
@@ -20,7 +20,7 @@ namespace CommunityBot.Services
         private bool _isStopPolling;
 
         public BotService(
-            ILogger<BotService> logger,
+            ILogger logger,
             ITelegramBotClient botClient,
             IEnumerable<IUpdateHandler> updateHandlers)
         {
@@ -40,7 +40,8 @@ namespace CommunityBot.Services
             var updateReceiver = new QueuedUpdateReceiver(_botClient);
             updateReceiver.StartReceiving();
             
-            _logger.LogInformation("Polling started!");
+            _logger.Information("Polling started!");
+            throw new Exception("test exception");
 
             await foreach (var update in updateReceiver.YieldUpdatesAsync())
             {
@@ -48,7 +49,7 @@ namespace CommunityBot.Services
 
                 if (_isStopPolling)
                 {
-                    _logger.LogInformation("Polling stopped!");
+                    _logger.Information("Polling stopped!");
                     break;
                 }
             }
@@ -61,7 +62,7 @@ namespace CommunityBot.Services
 
         public async Task HandleUpdate(Update update)
         {
-            _logger.LogTrace("Received update [{update}]", update.ToLog());
+            _logger.Debug("Received update [{update}]", update.ToLog());
             
             foreach (var updateHandler in _updateHandlers.OrderByDescending(uh => uh.OrderNumber))
             {
@@ -75,7 +76,7 @@ namespace CommunityBot.Services
                 }
             }
             
-            _logger.LogTrace("Handled update [{update}]", update.ToLog());
+            _logger.Debug("Handled update [{update}]", update.ToLog());
         }
     }
 }
