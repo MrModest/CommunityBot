@@ -18,7 +18,7 @@ namespace CommunityBot.Controllers
         [HttpGet("")]
         public IActionResult Get()
         {
-            return Ok("Please, use POST methods!");
+            return Ok($"Please, use POST methods! [{DateTime.Now.ToString("O")}]");
         }
         
         [HttpPost("api/web-hook")]
