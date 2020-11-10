@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
@@ -39,7 +38,7 @@ namespace CommunityBot.Handlers
                 _mediaGroupService.AddMediaToGroup(update.Message.MediaGroupId, media);
             }
             
-            Logger.LogWarning("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
+            Logger.LogInformation("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
             
             return Task.CompletedTask;
         }

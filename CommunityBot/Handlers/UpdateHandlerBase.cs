@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
@@ -23,7 +22,7 @@ namespace CommunityBot.Handlers
         protected UpdateHandlerBase(
             ITelegramBotClient botClient,
             IOptions<BotConfigurationOptions> options,
-            ILogger<UpdateHandlerBase> logger)
+            ILogger logger)
         {
             BotClient = botClient;
             Options = options.Value;

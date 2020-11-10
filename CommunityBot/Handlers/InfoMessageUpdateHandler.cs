@@ -1,15 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace CommunityBot.Handlers
 {
