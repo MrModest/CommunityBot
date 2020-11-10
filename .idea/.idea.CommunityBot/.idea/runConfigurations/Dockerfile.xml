@@ -11,7 +11,7 @@
           <list>
             <DockerPortBindingImpl>
               <option name="containerPort" value="443" />
-              <option name="hostPort" value="443" />
+              <option name="hostPort" value="10445" />
             </DockerPortBindingImpl>
           </list>
         </option>
