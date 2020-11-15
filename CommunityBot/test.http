@@ -1,3 +1,9 @@
+POST http://localhost:5001/api/set-webhook
+Content-Type: application/json
+
+{}
+
+###
 POST https://localhost:5001/api/start-polling
 Content-Type: application/json
 

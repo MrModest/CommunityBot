@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityBot.Contracts;
 using CommunityBot.Helpers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
@@ -14,6 +16,7 @@ namespace CommunityBot.Services
     public class BotService
     {
         private readonly ILogger<BotService> _logger;
+        private readonly IOptions<BotConfigurationOptions> _options;
         private readonly ITelegramBotClient _botClient;
         private readonly IEnumerable<IUpdateHandler> _updateHandlers;
 
@@ -21,10 +24,12 @@ namespace CommunityBot.Services
 
         public BotService(
             ILogger<BotService> logger,
+            IOptions<BotConfigurationOptions> options,
             ITelegramBotClient botClient,
             IEnumerable<IUpdateHandler> updateHandlers)
         {
             _logger = logger;
+            _options = options;
             _botClient = botClient;
             _updateHandlers = updateHandlers;
         }
@@ -57,6 +62,11 @@ namespace CommunityBot.Services
         public void StopPolling()
         {
             _isStopPolling = true;
+        }
+
+        public Task SetWebhook()
+        {
+            return _botClient.SetWebhookAsync(_options.Value.WebhookUrl);
         }
 
         public async Task HandleUpdate(Update update)

@@ -5,6 +5,8 @@ namespace CommunityBot.Contracts
         public const string SectionName = "BotConfiguration";
         
         public string BotToken { get; set; } = null!;
+        
+        public string WebhookUrl { get; set; } = null!;
 
         public string BotName { get; set; } = null!;
 

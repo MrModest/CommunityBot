@@ -28,6 +28,13 @@ namespace CommunityBot.Controllers
             return Ok();
         }
         
+        [HttpPost("api/set-webhook")]
+        public async Task<IActionResult> StartPolling()
+        {
+            await _botService.SetWebhook();
+            return Ok();
+        }
+        
         [HttpPost("api/start-polling")]
         public async Task<IActionResult> StartPolling(int? timeoutMinute = null)
         {
