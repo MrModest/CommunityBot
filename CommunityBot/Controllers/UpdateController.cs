@@ -49,12 +49,10 @@ namespace CommunityBot.Controllers
             return Ok(info);
         }
         
-        [HttpPost("api/start-polling/{timeoutMinute}")]
-        public async Task<IActionResult> StartPolling(int? timeoutMinute = null)
+        [HttpPost("api/start-polling")]
+        public async Task<IActionResult> StartPolling()
         {
-            await _botService.StartPolling(timeoutMinute.HasValue
-                ? TimeSpan.FromMinutes(timeoutMinute.Value)
-                : (TimeSpan?)null);
+            await _botService.StartPolling();
             return Ok();
         }
         

@@ -2,7 +2,13 @@ GET https://localhost:5001/api/get-webhook-info
 Accept: application/json
 
 ###
-POST http://localhost:5001/api/set-webhook
+POST https://localhost:5001/api/set-webhook
+Content-Type: application/json
+
+{}
+
+###
+POST https://localhost:5001/api/delete-webhook
 Content-Type: application/json
 
 {}

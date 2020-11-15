@@ -81,7 +81,7 @@ namespace CommunityBot.Services
 
         public async Task HandleUpdate(Update update)
         {
-            _logger.LogTrace("Received update [{update}]", update.ToLog());
+            _logger.LogInformation("Received update [{update}]", update.ToLog());
             
             foreach (var updateHandler in _updateHandlers.OrderByDescending(uh => uh.OrderNumber))
             {
@@ -95,7 +95,7 @@ namespace CommunityBot.Services
                 }
             }
             
-            _logger.LogTrace("Handled update [{update}]", update.ToLog());
+            _logger.LogInformation("Handled update [{update}]", update.ToLog());
         }
     }
 }
