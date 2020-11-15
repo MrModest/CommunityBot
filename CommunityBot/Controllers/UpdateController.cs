@@ -29,9 +29,16 @@ namespace CommunityBot.Controllers
         }
         
         [HttpPost("api/set-webhook")]
-        public async Task<IActionResult> StartPolling()
+        public async Task<IActionResult> SetWebhook()
         {
             await _botService.SetWebhook();
+            return Ok();
+        }
+        
+        [HttpPost("api/delete-webhook")]
+        public async Task<IActionResult> DeleteWebhook()
+        {
+            await _botService.DeleteWebhook();
             return Ok();
         }
         

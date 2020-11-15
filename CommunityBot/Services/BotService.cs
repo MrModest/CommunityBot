@@ -69,6 +69,11 @@ namespace CommunityBot.Services
             return _botClient.SetWebhookAsync(_options.Value.WebhookUrl);
         }
 
+        public Task DeleteWebhook()
+        {
+            return _botClient.DeleteWebhookAsync();
+        }
+
         public async Task HandleUpdate(Update update)
         {
             _logger.LogTrace("Received update [{update}]", update.ToLog());
