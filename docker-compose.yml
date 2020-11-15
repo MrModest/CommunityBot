@@ -1,0 +1,9 @@
+communitybot:
+  image: 'mrmodest/communitybot:latest'
+  restart: always
+  env_file:
+    - /opt/communitybot/env.dev.list
+  ports:
+    - '10445:443'
+  volumes:
+    - '/services/communitybot/db:/app/db'
