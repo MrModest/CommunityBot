@@ -42,7 +42,14 @@ namespace CommunityBot.Controllers
             return Ok();
         }
         
-        [HttpPost("api/start-polling")]
+        [HttpGet("api/get-webhook-info")]
+        public async Task<IActionResult> GetWebhookInfo()
+        {
+            var info = await _botService.GetWebhookInfo();
+            return Ok(info);
+        }
+        
+        [HttpPost("api/start-polling/{timeoutMinute}")]
         public async Task<IActionResult> StartPolling(int? timeoutMinute = null)
         {
             await _botService.StartPolling(timeoutMinute.HasValue
