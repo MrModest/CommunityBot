@@ -26,7 +26,7 @@ jobs:
         run: docker build -t communitybot .
       
       - name: Docker run
-        run: docker run -p 10445:443 -v /home/me/app/db:/app/db --name communitybot-container communitybot
+        run: docker run -d -p 10445:443 -v /home/me/app/db:/app/db --name communitybot-container communitybot
       
       - name: Check run
         run: curl localhost:10445
