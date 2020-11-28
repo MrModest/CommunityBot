@@ -23,10 +23,10 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Docker build
-        run: docker build -t mrmodest/communitybot .
+        run: docker build -t communitybot .
       
       - name: Docker run
-        run: docker run -p 10445:443 -v /home/me/app/db:/app/db --name community-tg-bot-container community-tg-bot
+        run: docker run -p 10445:443 -v /home/me/app/db:/app/db --name communitybot-container communitybot
       
       - name: Check run
         run: curl localhost:10445
