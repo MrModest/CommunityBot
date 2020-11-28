@@ -29,7 +29,7 @@ jobs:
         run: docker run -d -p 443:443 -v /home/me/app/db:/app/db --name communitybot-container communitybot
       
       - name: Waiting start
-        run: sleep 30s && docker logs communitybot-container
+        run: sleep 10s && docker logs communitybot-container
       
       - name: Check run
         run: curl -k -o - https://localhost:443
