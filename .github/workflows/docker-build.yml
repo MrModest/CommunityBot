@@ -32,4 +32,4 @@ jobs:
         run: sleep 30s && docker logs communitybot-container
       
       - name: Check run
-        run: curl -k https://localhost:443
+        run: curl -k -o - https://localhost:443
