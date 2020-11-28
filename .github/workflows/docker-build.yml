@@ -28,5 +28,8 @@ jobs:
       - name: Docker run
         run: docker run -d -p 10445:443 -v /home/me/app/db:/app/db --name communitybot-container communitybot
       
+      - name: Waiting start
+        run: sleep 30s
+      
       - name: Check run
         run: curl localhost:10445
