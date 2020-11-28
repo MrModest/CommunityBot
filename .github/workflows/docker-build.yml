@@ -26,10 +26,10 @@ jobs:
         run: docker build -t communitybot .
       
       - name: Docker run
-        run: docker run -d -p 10445:443 -v /home/me/app/db:/app/db --name communitybot-container communitybot
+        run: docker run -d -p 443:443 -v /home/me/app/db:/app/db --name communitybot-container communitybot
       
       - name: Waiting start
-        run: sleep 30s
+        run: sleep 30s && docker logs communitybot-container
       
       - name: Check run
-        run: curl localhost:10445
+        run: curl localhost:443
