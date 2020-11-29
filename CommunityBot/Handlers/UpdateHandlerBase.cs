@@ -37,7 +37,7 @@ namespace CommunityBot.Handlers
         {
             if (!AllowedUpdates.Contains(update.Type) || !CanHandle(update))
             {
-                Logger.LogInformation("Can't handle with '{handlerName}' | {update}", HandlerName, update.ToLog());
+                Logger.LogTrace("Can't handle with '{handlerName}' | {update}", HandlerName, update.ToLog());
                 return;
             }
             

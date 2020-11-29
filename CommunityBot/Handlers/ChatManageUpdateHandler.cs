@@ -64,9 +64,9 @@ namespace CommunityBot.Handlers
             }
         }
 
-        private async Task SendMessage(long replyChatId, string text, int replyToMessageId)
+        private async Task SendMessage(long replyChatId, string text, int replyToMessageId, ParseMode parseMode = ParseMode.Default)
         {
-            await BotClient.SendTextMessageAsync(replyChatId, text, replyToMessageId: replyToMessageId);
+            await BotClient.SendTextMessageAsync(replyChatId, text, replyToMessageId: replyToMessageId, disableWebPagePreview: true, parseMode: parseMode);
         }
 
         private async Task AddChat(string chatRawArgs, Update update)
@@ -158,17 +158,20 @@ namespace CommunityBot.Handlers
             if (!IsFromAdmin(update) || !update.Message.IsPrivate())
             {
                 await SendMessage(update.Message.Chat.Id, "Смотреть список всех чатов можно только админам и только в ЛС.", update.Message.MessageId);
+                return;
             }
 
             var chats = await _chatRepository.GetAll();
-
+            
             var chatMarkup = chats.Select(c =>
                     $"{c.JoinLink.ToHtmlLink(c.ExactName)}\n{c.JoinLink.ToMonospace()}")
                 .ToArray();
 
-            var resultMessage = string.Join("\n\n", chatMarkup);
-                
-            await SendMessage(update.Message.Chat.Id, resultMessage, update.Message.MessageId);
+            var resultMessage = chatMarkup.Any()
+                ? string.Join("\n\n", chatMarkup) 
+                : "Список чатов пуст!\nЕго можно пополнить при помощи команды /add_chat";
+
+            await SendMessage(update.Message.Chat.Id, resultMessage, update.Message.MessageId, ParseMode.Html);
         }
     }
 }

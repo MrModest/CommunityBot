@@ -19,11 +19,19 @@ namespace CommunityBot.Helpers
 {
     public static class StartupExtensions
     {
+        public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration)
+        {
+            return services
+                .Configure<BotConfigurationOptions>(configuration.GetSection(BotConfigurationOptions.SectionName))
+                .Configure<SQLiteConfigurationOptions>(configuration.GetSection(SQLiteConfigurationOptions.SectionName))
+                .Configure<LoggingConfigurationOptions>(configuration.GetSection(LoggingConfigurationOptions.SectionName));
+        }
+        
         public static IServiceCollection AddTelegramBotClient(this IServiceCollection services)
         {
             return services.AddSingleton<ITelegramBotClient>(provider =>
             {
-                var options = provider.GetService<IOptions<BotConfigurationOptions>>().Value;
+                var options = provider.GetRequiredService<IOptions<BotConfigurationOptions>>().Value;
                 
                 return new TelegramBotClient(options.BotToken);
             });
@@ -50,7 +58,7 @@ namespace CommunityBot.Helpers
         {
             return services.AddSingleton(provider =>
             {
-                var options = provider.GetService<IOptions<SQLiteConfigurationOptions>>().Value;
+                var options = provider.GetRequiredService<IOptions<SQLiteConfigurationOptions>>().Value;
                 
                 var connection = new SQLiteConnection($"DataSource=\"{options.DbFilePath}\";");
                 connection.Open();

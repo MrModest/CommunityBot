@@ -22,8 +22,7 @@ namespace CommunityBot
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .Configure<BotConfigurationOptions>(Configuration.GetSection(BotConfigurationOptions.SectionName))
-                .Configure<SQLiteConfigurationOptions>(Configuration.GetSection(SQLiteConfigurationOptions.SectionName))
+                .AddConfigurationOptions(Configuration)
                 .AddMemoryCache()
                 .AddSqliteDatabase()
                 .AddTelegramBotClient()
