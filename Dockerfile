@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0 AS build
 WORKDIR /src
 COPY ./CommunityBot.sln ./
 COPY ./CommunityBot/*.csproj ./CommunityBot/
@@ -8,7 +8,7 @@ COPY . .
 WORKDIR "/src/CommunityBot"
 RUN dotnet publish -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS final
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0 AS final
 EXPOSE 443
 WORKDIR /app
 COPY --from=build /app/publish .
