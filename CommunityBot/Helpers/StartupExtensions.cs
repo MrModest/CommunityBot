@@ -43,7 +43,8 @@ namespace CommunityBot.Helpers
                 .AddSingleton<IUpdateHandler, RepostMessageUpdateHandler>()
                 .AddSingleton<IUpdateHandler, InfoMessageUpdateHandler>()
                 .AddSingleton<IUpdateHandler, ChatManageUpdateHandler>()
-                .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>();
+                .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
+                .AddSingleton<IUpdateHandler, BackupUpdateHandler>();
         }
         
         public static IServiceCollection AddServices(this IServiceCollection services)

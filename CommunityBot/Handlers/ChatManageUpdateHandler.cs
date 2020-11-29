@@ -1,15 +1,16 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CommunityBot.Contracts;
-using CommunityBot.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Chat = Telegram.Bot.Types.Chat;
+
+using CommunityBot.Contracts;
+using CommunityBot.Helpers;
 
 namespace CommunityBot.Handlers
 {
