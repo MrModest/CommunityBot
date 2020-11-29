@@ -13,5 +13,10 @@ namespace CommunityBot.Helpers
         {
             return $"<a href=\"{rawLink}\">{linkText}</a>";
         }
+
+        public static string ToMonospace(this string raw)
+        {
+            return $"<code>{raw}</code>";
+        }
     }
 }

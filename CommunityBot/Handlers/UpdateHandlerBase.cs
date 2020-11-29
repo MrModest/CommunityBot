@@ -70,5 +70,22 @@ namespace CommunityBot.Handlers
                     $"Exception was throwed in handler '{HandlerName}':\n\n{exception.Message}\n\n{exception.StackTrace}");
             }
         }
+
+        protected bool IsFromAdmin(Update update)
+        {
+            var fromUser = update.Type switch
+            {
+                UpdateType.Message => update.Message.From,
+                UpdateType.ChannelPost => update.ChannelPost.From,
+                UpdateType.InlineQuery => update.InlineQuery.From,
+                UpdateType.ChosenInlineResult => update.ChosenInlineResult.From,
+                UpdateType.CallbackQuery => update.CallbackQuery.From,
+                UpdateType.EditedMessage => update.EditedMessage.From,
+                UpdateType.EditedChannelPost => update.EditedChannelPost.From,
+                _ => null
+            };
+
+            return Options.Admins.Contains(fromUser?.Username);
+        }
     }
 }

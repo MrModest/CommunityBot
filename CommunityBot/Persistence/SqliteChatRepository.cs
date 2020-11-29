@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 
@@ -10,6 +11,11 @@ namespace CommunityBot.Persistence
             : base(connection)
         {
         }
+        
+        public Task<IEnumerable<SavedChat>> GetAll()
+        {
+            return GetAllInternal();
+        }
 
         public async Task<SavedChat?> GetByName(string chatExactName)
         {
@@ -20,10 +26,10 @@ namespace CommunityBot.Persistence
         {
             await ExecuteAsync($"REMOVE FROM {TableName} where {nameof(SavedChat.ExactName)} = @name", new { name });
         }
-        
+
         public async Task AddOrUpdate(SavedChat savedChat)
         {
-            var existingEntity = await ById(savedChat.Id);
+            var existingEntity = await GetByName(savedChat.ExactName);
             if (existingEntity is null)
             {
                 savedChat.Id = await Insert(savedChat);

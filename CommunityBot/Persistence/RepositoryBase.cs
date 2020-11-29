@@ -20,7 +20,7 @@ namespace CommunityBot.Persistence
             _connection = connection;
         }
         
-        protected async Task<IEnumerable<TEntity>> GetAll() =>
+        protected async Task<IEnumerable<TEntity>> GetAllInternal() =>
             await _connection.GetAllAsync<TEntity>();
 
         protected async Task<TEntity> ById(long id) =>
