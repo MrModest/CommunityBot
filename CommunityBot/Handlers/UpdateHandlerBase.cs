@@ -29,7 +29,7 @@ namespace CommunityBot.Handlers
             Logger = logger;
         }
         
-        protected virtual UpdateType[] AllowedUpdates => Array.Empty<UpdateType>();
+        protected abstract UpdateType[] AllowedUpdates { get; }
 
         public virtual int OrderNumber => 0;
 

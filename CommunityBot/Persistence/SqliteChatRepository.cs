@@ -24,7 +24,7 @@ namespace CommunityBot.Persistence
 
         public async Task RemoveByName(string name)
         {
-            await ExecuteAsync($"REMOVE FROM {TableName} where {nameof(SavedChat.ExactName)} = @name", new { name });
+            await ExecuteAsync($"DELETE FROM {TableName} where {nameof(SavedChat.ExactName)} = @name", new { name });
         }
 
         public async Task AddOrUpdate(SavedChat savedChat)
