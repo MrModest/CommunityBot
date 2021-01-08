@@ -14,6 +14,13 @@ namespace CommunityBot.Contracts
         public string? InviteComment { get; set; }
         
         public UserAccessType AccessType { get; set; }
+        
+        public string? PasswordHash { get; set; }
+
+        public override string ToString()
+        {
+            return $"[Id: '{Id}' | UserName: '{Username}' | FirstName: '{FirstName}' | LastName: '{LastName}']";
+        }
     }
 
     public enum UserAccessType

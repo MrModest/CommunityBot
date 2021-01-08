@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Text;
+
 namespace CommunityBot.Helpers
 {
     public static class StringExtensions
@@ -16,6 +19,16 @@ namespace CommunityBot.Helpers
         public static bool IsNotBlank(this string? value)
         {
             return !string.IsNullOrWhiteSpace(value?.Trim());
+        }
+        
+        public static string CreateMd5(string input)
+        {
+            using System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
+            
+            byte[] inputBytes = Encoding.ASCII.GetBytes(input);
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+            return string.Join("", hashBytes.Select(b => b.ToString("X2")));
         }
     }
 }

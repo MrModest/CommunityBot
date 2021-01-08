@@ -46,6 +46,29 @@ namespace CommunityBot.Controllers
             return Content(string.Join("<hr />\n", logs), "text/html");
         }
         
+        [HttpGet("/delete-logs")]
+        public async Task<IActionResult> DeleteLogFile()
+        {
+            if (_loggingOptions.FilePath.IsBlank())
+            {
+                return NotFound("Log file not set!");
+            }
+
+            if (!System.IO.File.Exists(_loggingOptions.FilePath))
+            {
+                return NotFound($"Log file not found in {_loggingOptions.FilePath}");
+            }
+
+            System.IO.File.Delete(_loggingOptions.FilePath);
+            
+            if (!System.IO.File.Exists(_loggingOptions.FilePath))
+            {
+                return Ok($"File in {_loggingOptions.FilePath} was deleted!");
+            }
+
+            return Ok($"File in {_loggingOptions.FilePath} was NOT deleted!");
+        }
+        
         [HttpPost("api/web-hook")]
         public async Task<IActionResult> Post([FromBody]Update update)
         {
