@@ -17,14 +17,14 @@ namespace CommunityBot.Persistence
             return GetAllInternal();
         }
 
-        public async Task<SavedChat?> GetByName(string chatExactName)
+        public Task<SavedChat?> GetByName(string chatExactName)
         {
-            return await GetSingle($"SELECT * FROM {TableName} WHERE {nameof(SavedChat.ExactName)} = @name", new { name = chatExactName });
+            return ByField(nameof(SavedChat.ExactName), chatExactName);
         }
 
-        public async Task RemoveByName(string name)
+        public Task RemoveByName(string name)
         {
-            await ExecuteAsync($"DELETE FROM {TableName} where {nameof(SavedChat.ExactName)} = @name", new { name });
+            return ExecuteAsync($"DELETE FROM {TableName} where {nameof(SavedChat.ExactName)} = @name", new { name });
         }
 
         public async Task AddOrUpdate(SavedChat savedChat)

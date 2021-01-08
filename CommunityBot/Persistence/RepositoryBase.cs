@@ -23,10 +23,16 @@ namespace CommunityBot.Persistence
         protected async Task<IEnumerable<TEntity>> GetAllInternal() =>
             await _connection.GetAllAsync<TEntity>();
 
-        protected async Task<TEntity> ById(long id) =>
-            await _connection.GetAsync<TEntity>(id);
+        protected Task<IEnumerable<TEntity>> GetPageInternal(int pageNum, int pageSize = 10) =>
+            GetList($"SELECT * FROM {TableName} LIMIT @pageSize OFFSET @offset", new {pageSize, offset = pageNum * pageSize});
 
-        protected async Task<TEntity> GetSingle(string query, object parameters) =>
+        protected async Task<TEntity?> ById(long id) =>
+            await _connection.GetAsync<TEntity>(id);
+        
+        protected Task<TEntity?> ByField(string fieldName, string fieldValue) =>
+            GetSingleOrDefault($"SELECT * FROM {TableName} WHERE {fieldName} = @fieldValue", new {fieldValue});
+
+        protected async Task<TEntity?> GetSingleOrDefault(string query, object parameters) =>
             await _connection.QuerySingleOrDefaultAsync<TEntity>(query, parameters);
 
         protected async Task<IEnumerable<TEntity>> GetList(string query, object parameters) =>

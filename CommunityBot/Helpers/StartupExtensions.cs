@@ -44,7 +44,8 @@ namespace CommunityBot.Helpers
                 .AddSingleton<IUpdateHandler, InfoMessageUpdateHandler>()
                 .AddSingleton<IUpdateHandler, ChatManageUpdateHandler>()
                 .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
-                .AddSingleton<IUpdateHandler, BackupUpdateHandler>();
+                .AddSingleton<IUpdateHandler, BackupUpdateHandler>()
+                .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>();
         }
         
         public static IServiceCollection AddServices(this IServiceCollection services)
@@ -52,6 +53,7 @@ namespace CommunityBot.Helpers
             return services
                 .AddSingleton<BotService>()
                 .AddSingleton<IChatRepository, SqliteChatRepository>()
+                .AddSingleton<IAppUserRepository, AppUserRepository>()
                 .AddSingleton<IMediaGroupService, MediaGroupService>();
         }
         
@@ -94,7 +96,7 @@ namespace CommunityBot.Helpers
 
         private static void EnsureDatabase(SQLiteConnection connection)
         {
-            var appTableNames = new[] {"SavedChats"};
+            var appTableNames = new[] {"SavedChats", "Users"};
             
             var tableNames = connection.Query<string>("SELECT name FROM sqlite_master WHERE type='table';");
 
@@ -102,8 +104,27 @@ namespace CommunityBot.Helpers
             {
                 if (tableName == "SavedChats")
                 {
-                    connection.Execute("CREATE TABLE IF NOT EXISTS main.SavedChats (Id INT PRIMARY KEY, ChatId INT DEFAULT NULL, ExactName TEXT NOT NULL, JoinLink TEXT DEFAULT NULL);");
+                    connection.Execute(@"CREATE TABLE IF NOT EXISTS main.SavedChats (
+                                            Id        INT  PRIMARY KEY, 
+                                            ChatId    INT  DEFAULT NULL, 
+                                            ExactName TEXT NOT NULL, 
+                                            JoinLink  TEXT DEFAULT NULL);");
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.ExactName_desc ON SavedChats (ExactName DESC);");
+                }
+
+                if (tableName == "Users")
+                {
+                    connection.Execute(@"CREATE TABLE IF NOT EXISTS main.Users (
+                                            Id            INT  PRIMARY KEY, 
+                                            Username      TEXT DEFAULT NULL, 
+                                            FirstName     TEXT DEFAULT NULL, 
+                                            LastName      TEXT DEFAULT NULL, 
+                                            InvitedBy     INT  DEFAULT NULL, 
+                                            InviteComment TEXT DEFAULT NULL, 
+                                            AccessType    TEXT DEFAULT NULL);");
+                    
+                    connection.Execute("CREATE INDEX IF NOT EXISTS main.Username_desc   ON Users (Username DESC);");
+                    connection.Execute("CREATE INDEX IF NOT EXISTS main.AccessType_desc ON Users (AccessType DESC);");
                 }
             }
         }
