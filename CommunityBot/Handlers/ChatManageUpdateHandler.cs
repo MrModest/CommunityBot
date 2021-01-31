@@ -112,7 +112,21 @@ namespace CommunityBot.Handlers
                 return;
             }
 
-            if (inviteLink.IsBlank() && chat.InviteLink.IsBlank())
+            if (inviteLink.IsNotBlank())
+            {
+                if (!inviteLink.StartsWith("https://t.me/joinchat/"))
+                {
+                    await SendMessage(
+                        update.Message.Chat.Id,
+                        "Неправильная ссылка приглашение: ссылка должна начинаться с 'https://t.me/joinchat/'. Добавлять ссылку на публичные чаты не нужно.",
+                        update.Message.MessageId);
+                    return;
+                }
+                
+                chat.InviteLink = inviteLink.Trim();
+            }
+
+            if (chat.InviteLink.IsBlank())
             {
                 try
                 {
