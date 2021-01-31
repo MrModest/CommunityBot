@@ -59,6 +59,7 @@ namespace CommunityBot.Middleware
                 return;
             }
 
+            // For tests: '202CB962AC59075B964B07152D234B70' = '123'
             if (user.PasswordHash != StringExtensions.CreateMd5(password!))
             {
                 context.Result = GetUnauthorizedResult($"Wrong password '{password}' for user with id '{id}' or username '{username}'!");

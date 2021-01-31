@@ -121,7 +121,8 @@ namespace CommunityBot.Helpers
                                             LastName      TEXT DEFAULT NULL, 
                                             InvitedBy     INT  DEFAULT NULL, 
                                             InviteComment TEXT DEFAULT NULL, 
-                                            AccessType    TEXT DEFAULT NULL);");
+                                            AccessType    TEXT DEFAULT NULL,
+                                            PasswordHash  TEXT DEFAULT NULL);");
                     
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.Username_desc   ON Users (Username DESC);");
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.AccessType_desc ON Users (AccessType DESC);");

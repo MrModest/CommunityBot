@@ -23,6 +23,11 @@ namespace CommunityBot.Controllers
         {
             var users = await _appUserRepository.GetAll();
 
+            foreach (var user in users)
+            {
+                user.PasswordHash = "<hidden>";
+            }
+
             return Ok(users);
         }
         

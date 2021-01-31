@@ -16,7 +16,8 @@ namespace CommunityBot.Handlers
         public UserDataCollectorUpdateHandler(
             IAppUserRepository appUserRepository,
             ITelegramBotClient botClient, 
-            IOptions<BotConfigurationOptions> options, ILogger logger)
+            IOptions<BotConfigurationOptions> options, 
+            ILogger<UserDataCollectorUpdateHandler> logger)
             : base(botClient, options, logger)
         {
             _appUserRepository = appUserRepository;
