@@ -41,11 +41,11 @@ namespace CommunityBot.Handlers
                 return;
             }
             
-            Logger.LogInformation("Start handler: '{handlerName}' | {update}", HandlerName, update.ToLog());
+            Logger.LogTrace("Start handler: '{handlerName}' | {update}", HandlerName, update.ToLog());
 
             await HandleUpdateInternalAsync(update);
             
-            Logger.LogInformation("End handler: '{handlerName}'", HandlerName);
+            Logger.LogTrace("End handler: '{handlerName}'", HandlerName);
         }
 
         public async Task HandleErrorAsync(Exception exception, Update? update = null)

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
+using CommunityBot.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
@@ -12,15 +13,18 @@ namespace CommunityBot.Handlers
     public class UserDataCollectorUpdateHandler : UpdateHandlerBase
     {
         private readonly IAppUserRepository _appUserRepository;
+        private readonly InMemorySettingsService _inMemorySettingsService;
 
         public UserDataCollectorUpdateHandler(
             IAppUserRepository appUserRepository,
             ITelegramBotClient botClient, 
-            IOptions<BotConfigurationOptions> options, 
+            IOptions<BotConfigurationOptions> options,
+            InMemorySettingsService inMemorySettingsService,
             ILogger<UserDataCollectorUpdateHandler> logger)
             : base(botClient, options, logger)
         {
             _appUserRepository = appUserRepository;
+            _inMemorySettingsService = inMemorySettingsService;
         }
 
         protected override UpdateType[] AllowedUpdates => new[] {UpdateType.Message};
@@ -29,7 +33,7 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return update.Message.From != null;
+            return _inMemorySettingsService.GetSettingCollectUserInfo() && update.Message.From != null;
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)

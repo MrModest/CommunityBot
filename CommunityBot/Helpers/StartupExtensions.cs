@@ -55,7 +55,8 @@ namespace CommunityBot.Helpers
                 .AddSingleton<BotService>()
                 .AddSingleton<IChatRepository, SqliteChatRepository>()
                 .AddSingleton<IAppUserRepository, AppUserRepository>()
-                .AddSingleton<IMediaGroupService, MediaGroupService>();
+                .AddSingleton<IMediaGroupService, MediaGroupService>()
+                .AddSingleton<InMemorySettingsService>();
         }
         
         public static IServiceCollection AddSqliteDatabase(this IServiceCollection services)
