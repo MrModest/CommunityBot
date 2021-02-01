@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Пользователи</title>
+  <style>
+    
+  </style>
+</head>
+<body>
+<table class="user-table" id="usr-tbl">
+  <tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>FirstName</th>
+    <th>LastName</th>
+    <th>InvitedBy</th>
+    <th>InviteComment</th>
+    <th>AccessType</th>
+    <th>PasswordHash</th>
+  </tr>
+</table>
+</body>
+<script>
+  const model = {%model%}; //AppUser
+  
+  const createCheckbox = function(){
+    const td = document.createElement('td');
+    const chkbox = document.createElement("INPUT");
+    chkbox.setAttribute("type", "checkbox");
+
+    td.appendChild(chkbox);
+    
+    return td;
+  }
+  
+  const table = document.getElementById('usr-tbl');
+  
+  model.users.forEach(user => {
+    const tr = document.createElement('tr');
+    tr.classList.add('user-row');
+    Object.keys(user).forEach(k => {
+      const td = document.createElement('td');
+
+      td.classList.add('user-column', `user-${k}`)
+      td.innerText = user[k];
+
+      tr.appendChild(td);
+    });
+    
+    if (model.isAdmin) {
+      tr.appendChild(createCheckbox())
+    }
+    
+    table.appendChild(tr);
+  });
+  
+</script>
+</html>

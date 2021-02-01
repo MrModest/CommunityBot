@@ -6,17 +6,21 @@ using CommunityBot.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 
 namespace CommunityBot.Middleware
 {
     public class TgAuthorizationFilter : IAsyncActionFilter
     {
         private readonly IAppUserRepository _appUserRepository;
+        private readonly BotConfigurationOptions _botConfigurationOptions;
 
         public TgAuthorizationFilter(
-            IAppUserRepository appUserRepository)
+            IAppUserRepository appUserRepository,
+            IOptions<BotConfigurationOptions> botConfigurationOptions)
         {
             _appUserRepository = appUserRepository;
+            _botConfigurationOptions = botConfigurationOptions.Value;
         }
         
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -68,6 +72,11 @@ namespace CommunityBot.Middleware
 
             context.HttpContext.Request.Headers.Add("CurrentUserTgId", user.Id.ToString());
             context.HttpContext.Request.Headers.Add("CurrentUserTgUserName", user.Username);
+
+            if (_botConfigurationOptions.Admins.Contains(user.Username))
+            {
+                context.HttpContext.Request.Headers.Add("CurrentUserIsAdmin", "true");
+            }
             
             await next();
         }
