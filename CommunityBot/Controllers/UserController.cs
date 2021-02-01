@@ -83,7 +83,7 @@ namespace CommunityBot.Controllers
                 throw new IOException($"Can't get projectDirectory. AssemblyLocation: '{assemblyLocation}'");
             }
             
-            var path = Path.Combine(projectDir, $"{viewName}.html");
+            var path = Path.Combine(projectDir, $"ViewTemplates/{viewName}.html");
 
             var json = JsonConvert.SerializeObject(model);
             var htmlTemplate = await System.IO.File.ReadAllTextAsync(path);
