@@ -75,18 +75,24 @@ namespace CommunityBot.Controllers
 
         private async Task<IActionResult> GetHtmlView(string viewName, object model)
         {
-            var assemblyLocation = Assembly.GetExecutingAssembly().Location;
-            var projectDir = Path.GetDirectoryName(assemblyLocation);
-
-            if (projectDir == null)
+            if (viewName == null)
             {
-                throw new IOException($"Can't get projectDirectory. AssemblyLocation: '{assemblyLocation}'");
+                throw new ArgumentNullException(nameof(viewName));
             }
+        
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"{Path.GetFileNameWithoutExtension(assembly.ManifestModule.Name)}.ViewTemplates.{viewName}.html";
+            var htmlTemplateStream = assembly.GetManifestResourceStream(resourceName);
             
-            var path = Path.Combine(projectDir, $"ViewTemplates/{viewName}.html");
+            if (htmlTemplateStream == null)
+            {
+                throw new ArgumentException($"The specified embedded resource {resourceName} is not found.");
+            }
+
+            var htmlTemplate = await new StreamReader(htmlTemplateStream).ReadToEndAsync();
 
             var json = JsonConvert.SerializeObject(model);
-            var htmlTemplate = await System.IO.File.ReadAllTextAsync(path);
+            
             var htmlResult = htmlTemplate.Replace("{%model%}", json);
 
             return Content(string.Join("<hr />\n", htmlResult), "text/html");
