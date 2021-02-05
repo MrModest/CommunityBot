@@ -24,6 +24,15 @@
 <script>
   const model = {%model%}; //AppUser
   
+  const createUserColumn = function(fieldName, fieldValue){
+    const td = document.createElement('td');
+
+    td.classList.add('user-column', `user-${fieldName}`)
+    td.innerText = fieldValue;
+    
+    return td;
+  };
+  
   const createCheckbox = function(){
     const td = document.createElement('td');
     const chkbox = document.createElement("INPUT");
@@ -32,23 +41,24 @@
     td.appendChild(chkbox);
     
     return td;
-  }
+  };
   
   const table = document.getElementById('usr-tbl');
   
   model.users.forEach(user => {
     const tr = document.createElement('tr');
     tr.classList.add('user-row');
-    Object.keys(user).forEach(k => {
-      const td = document.createElement('td');
-
-      td.classList.add('user-column', `user-${k}`)
-      td.innerText = user[k];
-
-      tr.appendChild(td);
-    });
+    
+    tr.appendChild(createUserColumn('id', user.id));
+    tr.appendChild(createUserColumn('username', user.username));
+    tr.appendChild(createUserColumn('firstName', user.firstName));
+    tr.appendChild(createUserColumn('lastName', user.lastName));
+    tr.appendChild(createUserColumn('invitedBy', user.invitedBy));
+    tr.appendChild(createUserColumn('inviteComment', user.inviteComment));
+    tr.appendChild(createUserColumn('accessType', user.accessType));
     
     if (model.isAdmin) {
+      tr.appendChild(createUserColumn('passwordHash', user.passwordHash));
       tr.appendChild(createCheckbox())
     }
     
