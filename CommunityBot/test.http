@@ -1,3 +1,6 @@
+GET https://localhost:5001/api/users-list?username=admin&password=123
+
+###
 POST https://localhost:5001/api/users/add?username=admin&password=123
 Content-Type: application/json
 

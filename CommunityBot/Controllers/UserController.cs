@@ -8,6 +8,7 @@ using CommunityBot.Helpers;
 using CommunityBot.Middleware;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace CommunityBot.Controllers
 {
@@ -41,13 +42,16 @@ namespace CommunityBot.Controllers
             var users = (await _appUserRepository.GetAll())
                 .ToArray();
 
-            foreach (var user in users)
-            {
-                user.PasswordHash = "<hidden>";
-            }
-
             var isAdminString = HttpContext.Request.Headers["CurrentUserIsAdmin"].FirstOrDefault();
             var isAdmin = bool.TryParse(isAdminString, out var v) && v;
+
+            if (!isAdmin)
+            {
+                foreach (var user in users)
+                {
+                    user.PasswordHash = "<hidden>";
+                }
+            }
 
             return await GetHtmlView("UserList", new
             {
@@ -76,27 +80,32 @@ namespace CommunityBot.Controllers
 
         private async Task<IActionResult> GetHtmlView(string viewName, object model)
         {
+            var htmlResult = await GetHtmlString(viewName, model);
+
+            return Content(string.Join("<hr />\n", htmlResult), "text/html");
+        }
+
+        private static async Task<string> GetHtmlString(string viewName, object model)
+        {
             if (viewName == null)
             {
                 throw new ArgumentNullException(nameof(viewName));
             }
         
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = $"{Path.GetFileNameWithoutExtension(assembly.ManifestModule.Name)}.ViewTemplates.{viewName}.html";
-            var htmlTemplateStream = assembly.GetManifestResourceStream(resourceName);
-            
-            if (htmlTemplateStream == null)
+            var assemblyLocation = Assembly.GetExecutingAssembly().Location;
+            var projectDir = Path.GetDirectoryName(assemblyLocation);
+
+            if (projectDir == null)
             {
-                throw new ArgumentException($"The specified embedded resource {resourceName} is not found.");
+                throw new IOException($"Can't get projectDirectory. AssemblyLocation: '{assemblyLocation}'");
             }
-
-            var htmlTemplate = await new StreamReader(htmlTemplateStream).ReadToEndAsync();
-
-            var json = JsonConvert.SerializeObject(model);
             
-            var htmlResult = htmlTemplate.Replace("{%model%}", json);
+            var path = Path.Combine(projectDir, $"ViewTemplates\\{viewName}.html");
 
-            return Content(string.Join("<hr />\n", htmlResult), "text/html");
+            var json = JsonConvert.SerializeObject(model, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            var htmlTemplate = await System.IO.File.ReadAllTextAsync(path);
+            
+            return htmlTemplate.Replace("{%model%}", json);
         }
     }
 }

@@ -27,5 +27,11 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="ViewTemplates\UserList.html">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 
 </Project>
