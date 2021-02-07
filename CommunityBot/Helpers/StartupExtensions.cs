@@ -1,4 +1,5 @@
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using CommunityBot.Contracts;
 using CommunityBot.Handlers;
@@ -79,9 +80,15 @@ namespace CommunityBot.Helpers
             var configuration = hostBuilderContext.Configuration;
             var loggerConfiguration = new LoggerConfiguration();
             
+            /*loggerConfiguration = loggerConfiguration
+                .WriteTo
+                .File(configuration.GetSection("Logging:FilePath").Value);*/
+
+            var pathFormat = Path.Combine(configuration.GetSection("Logging:LogDir").Value, "log-{Date}.txt");
+
             loggerConfiguration = loggerConfiguration
                 .WriteTo
-                .File(configuration.GetSection("Logging:FilePath").Value);
+                .RollingFile(pathFormat);
 
             var telegramApiKey = configuration.GetSection("BotConfiguration:BotToken").Value;
             var debugInfoChatIds = configuration.GetSection("BotConfiguration:DebugInfoChatIds").Get<long[]>();

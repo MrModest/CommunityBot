@@ -5,5 +5,7 @@ namespace CommunityBot.Contracts
         public const string SectionName = "Logging";
         
         public string FilePath { get; set; } = null!;
+        
+        public string LogDir { get; set; } = null!;
     }
 }

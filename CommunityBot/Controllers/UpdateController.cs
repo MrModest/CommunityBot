@@ -11,14 +11,11 @@ namespace CommunityBot.Controllers
 {
     public class UpdateController : ControllerBase
     {
-        private readonly LoggingConfigurationOptions _loggingOptions;
         private readonly BotService _botService;
 
         public UpdateController(
-            IOptions<LoggingConfigurationOptions> loggingOptions,
             BotService botService)
         {
-            _loggingOptions = loggingOptions.Value;
             _botService = botService;
         }
 
@@ -28,47 +25,6 @@ namespace CommunityBot.Controllers
             return Ok($"Please, use POST methods! [{DateTime.Now.ToString("O")}]");
         }
 
-        [HttpGet("/logs")]
-        public async Task<IActionResult> GetLogs()
-        {
-            if (_loggingOptions.FilePath.IsBlank())
-            {
-                return NotFound("Log file not set!");
-            }
-
-            if (!System.IO.File.Exists(_loggingOptions.FilePath))
-            {
-                return NotFound($"Log file not found in {_loggingOptions.FilePath}");
-            }
-
-            var logs = await System.IO.File.ReadAllLinesAsync(_loggingOptions.FilePath);
-
-            return Content(string.Join("<hr />\n", logs), "text/html");
-        }
-        
-        [HttpGet("/delete-logs")]
-        public async Task<IActionResult> DeleteLogFile()
-        {
-            if (_loggingOptions.FilePath.IsBlank())
-            {
-                return NotFound("Log file not set!");
-            }
-
-            if (!System.IO.File.Exists(_loggingOptions.FilePath))
-            {
-                return NotFound($"Log file not found in {_loggingOptions.FilePath}");
-            }
-
-            System.IO.File.Delete(_loggingOptions.FilePath);
-            
-            if (!System.IO.File.Exists(_loggingOptions.FilePath))
-            {
-                return Ok($"File in {_loggingOptions.FilePath} was deleted!");
-            }
-
-            return Ok($"File in {_loggingOptions.FilePath} was NOT deleted!");
-        }
-        
         [HttpPost("api/web-hook")]
         public async Task<IActionResult> Post([FromBody]Update update)
         {
