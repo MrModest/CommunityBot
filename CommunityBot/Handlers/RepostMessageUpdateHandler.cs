@@ -40,7 +40,7 @@ namespace CommunityBot.Handlers
             var command = update.Message.GetFirstBotCommand();
             
             return command.HasValue && command.Value.name == CreatePostCommand && command.Value.arg.IsNotBlank() ||
-                   update.Message.GetMentionedUserNames().Any(u => u == Options.BotName);
+                   update.Message.HasMentionOfUserName(Options.BotName);
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)
@@ -52,7 +52,7 @@ namespace CommunityBot.Handlers
                 message = update.Message;
             }
 
-            if (update.Message.GetMentionedUserNames().Any(u => u == Options.BotName))
+            if (update.Message.HasMentionOfUserName(Options.BotName))
             {
                 message = update.Message.ReplyToMessage;
             }
