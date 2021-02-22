@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -61,6 +62,12 @@ namespace CommunityBot.Helpers
                 .Select(e => message.Text.Substring(e.Offset + 1, e.Length - 1))
                 .ToArray()
                    ?? new string[0];
+        }
+        
+        public static bool HasMentionOfUserName(this Message message, string username)
+        {
+            return message.GetMentionedUserNames()
+                .Any(m => m.Equals(username, StringComparison.OrdinalIgnoreCase));
         }
 
         public static IAlbumInputMedia? ToInputMedia(this Message message)
