@@ -27,13 +27,15 @@ namespace CommunityBot.Controllers
             }
 
             date ??= DateTime.Today.ToString("yyyyMMdd");
+            
+            var logPath = Path.Combine(_loggingOptions.LogDir, $"log-{date}.txt");
 
-            if (!System.IO.File.Exists(Path.Combine(_loggingOptions.LogDir, $"log-{date}.txt")))
+            if (!System.IO.File.Exists(logPath))
             {
-                return NotFound($"Log file not found in {_loggingOptions.FilePath}");
+                return NotFound($"Log file not found in {logPath}");
             }
 
-            var logs = await System.IO.File.ReadAllLinesAsync(_loggingOptions.FilePath);
+            var logs = await System.IO.File.ReadAllLinesAsync(logPath);
 
             return Content(string.Join("________________________________________________\n", logs), "text/plain");
         }
