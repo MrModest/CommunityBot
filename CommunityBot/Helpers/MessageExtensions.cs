@@ -38,24 +38,18 @@ namespace CommunityBot.Helpers
             var entity = message.Entities?
                 .FirstOrDefault(e => e.Type == MessageEntityType.BotCommand);
 
-            return entity != null
-                ? (
-                    name: message.Text.Substring(entity.Offset + 1, entity.Length - 1),
-                    arg: message.Text.Remove(entity.Offset, entity.Length).Trim()
-                  )
-                : ((string name, string arg)?)null;
+            if (entity == null)
+            {
+                return null;
+            }
+
+            return (
+                name: message.Text.Substring(entity.Offset + 1, entity.Length - 1),
+                arg: message.Text.Remove(entity.Offset, entity.Length).Trim()
+            );
         }
 
-        public static string? GetArgIfIsCommandOf(this Message message, string commandName)
-        {
-            var command = message.GetFirstBotCommand();
-
-            return command?.name == commandName
-                ? command.Value.arg
-                : null;
-        }
-
-        public static string[] GetMentionedUserNames(this Message message)
+        private static string[] GetMentionedUserNames(this Message message)
         {
             return message.Entities?
                 .Where(e => e.Type == MessageEntityType.Mention)
@@ -89,11 +83,6 @@ namespace CommunityBot.Helpers
                 default:
                     return null;
             }
-        }
-        
-        public static InputMediaVideo ToInputMedia(this Video video)
-        {
-            return new InputMediaVideo(video.FileId);
         }
     }
 }

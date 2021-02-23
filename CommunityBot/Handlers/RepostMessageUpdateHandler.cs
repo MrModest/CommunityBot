@@ -140,6 +140,14 @@ namespace CommunityBot.Handlers
         {
             var post = new StringBuilder();
             var postText = message.GetFirstBotCommand()?.arg ?? message.Text ?? message.Caption;
+
+            postText = MessageEntityWrapper.GetMarkupMessage(
+                postText,
+                message.Text != null 
+                    ? message.Entities 
+                    : message.CaptionEntities, 
+                ParseMode.Html);
+            
             post.Append($"{postText}\n\n");
             post.Append($" — {message.From.GetMentionHtmlLink()}");
             
