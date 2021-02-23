@@ -9,12 +9,12 @@ namespace CommunityBot.Helpers
     {
         public static bool IsBotCommand(this Message message)
         {
-            return message.Entities?.Any(e => e.Type == MessageEntityType.BotCommand) ?? false;
+            return message.GetEntities().Any(e => e.Type == MessageEntityType.BotCommand);
         }
 
         public static bool IsMention(this Message message)
         {
-            return message.Entities?.Any(e => e.Type == MessageEntityType.Mention) ?? false;
+            return message.GetEntities().Any(e => e.Type == MessageEntityType.Mention);
         }
 
         public static bool IsPrivate(this Message message)
@@ -32,10 +32,17 @@ namespace CommunityBot.Helpers
         {
             return $"https://t.me/c/{message.Chat.Id.ToString().Substring(4)}/{message.MessageId}";
         }
+
+        public static MessageEntity[] GetEntities(this Message message)
+        {
+            return message.Type == MessageType.Text 
+                ? message.Entities.EmptyIfNull() 
+                : message.CaptionEntities.EmptyIfNull();
+        }
         
         public static (string name, string arg)? GetFirstBotCommand(this Message message)
         {
-            var entity = message.Entities?
+            var entity = message.GetEntities()
                 .FirstOrDefault(e => e.Type == MessageEntityType.BotCommand);
 
             if (entity == null)
@@ -51,11 +58,10 @@ namespace CommunityBot.Helpers
 
         private static string[] GetMentionedUserNames(this Message message)
         {
-            return message.Entities?
+            return message.GetEntities()
                 .Where(e => e.Type == MessageEntityType.Mention)
                 .Select(e => message.Text.Substring(e.Offset + 1, e.Length - 1))
-                .ToArray()
-                   ?? new string[0];
+                .ToArray();
         }
         
         public static bool HasMentionOfUserName(this Message message, string username)
