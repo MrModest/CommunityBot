@@ -8,7 +8,7 @@ using Dapper.Contrib.Extensions;
 
 namespace CommunityBot.Persistence
 {
-    public abstract class RepositoryBase<TEntity> where TEntity : EntityBase, new()
+    public abstract class RepositoryBase<TEntity> where TEntity : class, IEntity, new()
     {
         private readonly SQLiteConnection _connection;
 

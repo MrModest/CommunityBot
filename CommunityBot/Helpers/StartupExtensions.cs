@@ -114,23 +114,23 @@ namespace CommunityBot.Helpers
                 if (tableName == "SavedChats")
                 {
                     connection.Execute(@"CREATE TABLE IF NOT EXISTS main.SavedChats (
-                                            Id        INT  PRIMARY KEY, 
-                                            ChatId    INT  DEFAULT NULL, 
+                                            Id        INT  NOT NULL PRIMARY KEY, 
+                                            ChatId    INT  NOT NULL, 
                                             ExactName TEXT NOT NULL, 
-                                            JoinLink  TEXT DEFAULT NULL);");
+                                            JoinLink  TEXT NOT NULL);");
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.ExactName_desc ON SavedChats (ExactName DESC);");
                 }
 
                 if (tableName == "Users")
                 {
                     connection.Execute(@"CREATE TABLE IF NOT EXISTS main.Users (
-                                            Id            INT  PRIMARY KEY, 
+                                            Id            INT  NOT NULL PRIMARY KEY, 
                                             Username      TEXT DEFAULT NULL, 
                                             FirstName     TEXT DEFAULT NULL, 
                                             LastName      TEXT DEFAULT NULL, 
                                             InvitedBy     INT  DEFAULT NULL, 
                                             InviteComment TEXT DEFAULT NULL, 
-                                            AccessType    TEXT DEFAULT NULL,
+                                            AccessType    TEXT NOT NULL,
                                             PasswordHash  TEXT DEFAULT NULL);");
                     
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.Username_desc   ON Users (Username DESC);");

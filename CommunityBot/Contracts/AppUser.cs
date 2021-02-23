@@ -1,8 +1,13 @@
+using Dapper.Contrib.Extensions;
+
 namespace CommunityBot.Contracts
 {
-    [Dapper.Contrib.Extensions.Table("Users")]
-    public class AppUser : EntityBase
+    [Table("Users")]
+    public class AppUser : IEntity
     {
+        [ExplicitKey]
+        public long Id { get; set; }
+        
         public string? Username { get; set; }
 
         public string? FirstName { get; set; }

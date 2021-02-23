@@ -1,7 +1,9 @@
+using Dapper.Contrib.Extensions;
+
 namespace CommunityBot.Contracts
 {
-    [Dapper.Contrib.Extensions.Table("SavedChats")]
-    public class SavedChat : EntityBase
+    [Table("SavedChats")]
+    public class SavedChat : IEntity
     {
         public SavedChat(long chatId, string exactName, string joinLink)
         {
@@ -17,6 +19,9 @@ namespace CommunityBot.Contracts
         {
             
         }
+
+        [Key]
+        public long Id { get; set; }
 
         public long ChatId { get; }
         public string ExactName { get; }

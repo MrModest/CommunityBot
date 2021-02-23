@@ -73,8 +73,9 @@ namespace CommunityBot.Handlers
             await _appUserRepository.Update(appUser);
             
             await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
-                $"Пароль обновлён! Ваш новый пароль: '{password}' (без кавычек). Из пароля были удалены пробелы в начале и в конце, если они были.",
-                replyToMessageId: update.Message.MessageId);
+                $"Пароль обновлён! Ваш новый пароль: <code>{password}</code>\n" +
+                "Из пароля были удалены пробелы в начале и в конце, если они были.",
+                replyToMessageId: update.Message.MessageId, parseMode: ParseMode.Html);
         }
 
         private async Task SetCollectUserInfoSetting(Update update, string value)
