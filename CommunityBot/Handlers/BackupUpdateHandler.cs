@@ -35,8 +35,7 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return new[] {BackupDbCommand}
-                .Contains(update.Message.GetFirstBotCommand()?.name);
+            return update.Message.ContainCommand(BackupDbCommand);
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)

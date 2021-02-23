@@ -56,6 +56,11 @@ namespace CommunityBot.Helpers
             );
         }
 
+        public static bool ContainCommand(this Message message, params string[] commands)
+        {
+            return message.GetFirstBotCommand()?.name.In(commands) == true;
+        }
+
         private static string[] GetMentionedUserNames(this Message message)
         {
             return message.GetEntities()

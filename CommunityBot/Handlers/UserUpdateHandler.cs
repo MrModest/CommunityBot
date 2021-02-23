@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Helpers;
 using CommunityBot.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -17,6 +20,7 @@ namespace CommunityBot.Handlers
         private readonly InMemorySettingsService _inMemorySettingsService;
         private const string SetPasswordCommand = "set_password";
         private const string CollectUserInfoCommand = "collect_user_info";
+        private const string AddUsersFromJsonCommand = "add_users_from_json";
 
         public UserUpdateHandler(
             ITelegramBotClient botClient,
@@ -34,7 +38,7 @@ namespace CommunityBot.Handlers
         protected override bool CanHandle(Update update)
         {
             return update.Message.IsPrivate() &&
-                   new[] {SetPasswordCommand, CollectUserInfoCommand}.Contains(update.Message.GetFirstBotCommand()?.name);
+                   update.Message.ContainCommand(SetPasswordCommand, CollectUserInfoCommand, AddUsersFromJsonCommand);
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)
@@ -48,6 +52,9 @@ namespace CommunityBot.Handlers
                     break;
                 case CollectUserInfoCommand:
                     await SetCollectUserInfoSetting(update, command.arg);
+                    break;
+                case AddUsersFromJsonCommand:
+                    await AddUsersFromJson(update);
                     break;
             }
         }
@@ -101,6 +108,58 @@ namespace CommunityBot.Handlers
             await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
                 "Значение обновлено!",
                 replyToMessageId: update.Message.MessageId);
+        }
+
+        private async Task AddUsersFromJson(Update update)
+        {
+            if (!IsFromAdmin(update))
+            {
+                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                    "Данная команда доступна только администраторам!",
+                    replyToMessageId: update.Message.MessageId);
+                return;
+            }
+            
+            if (update.Message.Type != MessageType.Document)
+            {
+                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                    "Вместе с коммандой необходимо приложить json файл с массивом юзеров внутри.",
+                    replyToMessageId: update.Message.MessageId);
+            }
+            
+            await using var stream = new MemoryStream();
+            await BotClient.GetInfoAndDownloadFileAsync(update.Message.Document.FileId, stream);
+
+            var json = await new StreamReader(stream).ReadToEndAsync();
+
+            try
+            {
+                var users = JsonConvert.DeserializeObject<AppUser[]>(json);
+
+                foreach (var user in users)
+                {
+                    if (await _appUserRepository.IsExisted(user.Id))
+                    {
+                        await _appUserRepository.Update(user);
+                    }
+                    else
+                    {
+                        await _appUserRepository.Add(user);
+                    }
+                }
+                Logger.LogWarning("Следующие пользователи были добавлены или обновлены ({userCount})\n\n: {users}", users.Length, string.Join<AppUser>("\n", users));
+
+                await BotClient.SendTextMessageAsync(update.Message.Chat.Id, 
+                    $"Следующие пользователи были добавлены или обновлены ({users.Length})\n\n: {string.Join<AppUser>("\n", users)}",
+                    replyToMessageId: update.Message.MessageId);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Не удалось десериализовать файл: {exMessage} | {exStackTrace}", e.Message, e.StackTrace);
+                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                    $"Не удалось десериализовать файл: {e.Message} | {e.StackTrace}",
+                    replyToMessageId: update.Message.MessageId);
+            }
         }
     }
 }

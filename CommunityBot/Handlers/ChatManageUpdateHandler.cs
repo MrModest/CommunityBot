@@ -37,8 +37,7 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return new[] {AddChatCommand, AddThisChatCommand, RemoveChatCommand, GetAllChatsCommand, GetIdOfThisChat}
-                .Contains(update.Message.GetFirstBotCommand()?.name);
+            return update.Message.ContainCommand(AddChatCommand, AddThisChatCommand, RemoveChatCommand, GetAllChatsCommand, GetIdOfThisChat);
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)
