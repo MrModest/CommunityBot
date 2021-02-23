@@ -130,6 +130,16 @@ namespace CommunityBot.Handlers
             await using var stream = new MemoryStream();
             await BotClient.GetInfoAndDownloadFileAsync(update.Message.Document.FileId, stream);
 
+            if (stream.Position != 0)
+            {
+                if (!stream.CanSeek)
+                {
+                    throw new InvalidOperationException(
+                        $"Can't seek file '{update.Message.Document.FileId}' | '{update.Message.Document.FileName}' | '{update.Message.Document.FileSize}'");
+                }
+                stream.Position = 0;
+            }
+
             var json = await new StreamReader(stream).ReadToEndAsync();
 
             try

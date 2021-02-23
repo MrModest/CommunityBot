@@ -50,9 +50,13 @@ namespace CommunityBot.Helpers
                 return null;
             }
 
+            var text = message.Type == MessageType.Text
+                ? message.Text
+                : message.Caption;
+
             return (
-                name: message.Text.Substring(entity.Offset + 1, entity.Length - 1),
-                arg: message.Text.Remove(entity.Offset, entity.Length).Trim()
+                name: text.Substring(entity.Offset + 1, entity.Length - 1),
+                arg: text.Remove(entity.Offset, entity.Length).Trim()
             );
         }
 
