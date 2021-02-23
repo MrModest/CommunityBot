@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CommunityBot.Helpers
@@ -13,6 +14,11 @@ namespace CommunityBot.Helpers
         public static bool NotIn<T>(this T value, params T[] constrainList)
         {
             return !constrainList.Contains(value);
+        }
+
+        public static T[] EmptyIfNull<T>(this T[]? array)
+        {
+            return array ?? Array.Empty<T>();
         }
     }
 }

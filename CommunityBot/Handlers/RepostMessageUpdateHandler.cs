@@ -144,8 +144,8 @@ namespace CommunityBot.Handlers
             postText = MessageEntityWrapper.GetMarkupMessage(
                 postText,
                 message.Text != null 
-                    ? message.Entities 
-                    : message.CaptionEntities, 
+                    ? message.Entities.EmptyIfNull()
+                    : message.CaptionEntities.EmptyIfNull(), 
                 ParseMode.Html);
             
             post.Append($"{postText}\n\n");

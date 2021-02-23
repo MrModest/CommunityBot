@@ -57,7 +57,7 @@ namespace CommunityBot.Helpers
             }
         }
 
-        private static (Dictionary<int,string[]> insertBefore, Dictionary<int,string[]> insertAfter) GetByEntities(MessageEntity[] entities, ParseMode parseMode)
+        private static (ILookup<int,string> insertBefore, ILookup<int,string> insertAfter) GetByEntities(MessageEntity[] entities, ParseMode parseMode)
         {
             var formattedEntities = entities
                 .Where(e => e.Type.In(SupportedEntityTypes))
@@ -65,14 +65,12 @@ namespace CommunityBot.Helpers
                 .ToArray();
             
             var insertBefore = formattedEntities
-                .ToLookup(e => e.StartIndex, e => e.Prefix)
-                .ToDictionary(e => e.Key, g => g.ToArray());
+                .ToLookup(e => e.StartIndex, e => e.Prefix);
             
             // Reverse тут, чтобы "скобки" на одинаковой позиции закрывались в позиции обратной открываемой,
             // Дабы избежать ситуации <b><u>text</b></u>.
             var insertAfter = formattedEntities.Reverse()
-                .ToLookup(e => e.EndIndex, e => e.Postfix)
-                .ToDictionary(e => e.Key, g => g.ToArray());
+                .ToLookup(e => e.EndIndex, e => e.Postfix);
 
             return (insertBefore, insertAfter);
         }
@@ -85,8 +83,8 @@ namespace CommunityBot.Helpers
 
             for (var i = 0; i < plainText.Length; i++)
             {
-                var currentInsertBefore = insertBefore[i];
-                var currentInsertAfter = insertAfter[i];
+                var currentInsertBefore = insertBefore[i].ToArray();
+                var currentInsertAfter = insertAfter[i].ToArray();
                 
                 if (currentInsertBefore.Any())
                 {
