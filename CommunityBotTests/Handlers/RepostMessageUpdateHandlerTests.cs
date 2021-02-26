@@ -127,7 +127,67 @@ namespace CommunityBotTests.Handlers
             Assert.Equal(ParseMode.Html, sendTextMessageAsyncArgs.parseMode);
         }
 
-        private static Update GetTextReplyUpdate(string repostMessage)
+        [Fact]
+        public void RepostFormattingTextMessage()
+        {
+            const string repostMessage = "Post text with bold and italic text. Also it have an inline link.";
+            const string repostFormatMessage = "Post text with <b>bold</b> and <i>italic</i> text. Also it have an <a href='https://github.com/'>inline link</a>.";
+            
+            var entities = new []
+            {
+                new MessageEntity
+                {
+                    Offset = 15,
+                    Length = 4,
+                    Type = MessageEntityType.Bold
+                },
+                new MessageEntity
+                {
+                    Offset = 24,
+                    Length = 6,
+                    Type = MessageEntityType.Italic
+                },
+                new MessageEntity
+                {
+                    Offset = 53,
+                    Length = 11,
+                    Type = MessageEntityType.TextLink,
+                    Url = "https://github.com/"
+                }
+            };
+            
+            var update = GetTextReplyUpdate(repostMessage, entities);
+            
+            var expectedText = $"{repostFormatMessage}\n\n" +
+                               $"{GetFooterText(update)}";
+                               
+            var botClientMoq = new Mock<ITelegramBotClient>();
+
+            (ChatId chatId, string text, ParseMode parseMode, bool disableWebPagePreview) sendTextMessageAsyncArgs = (0, "", ParseMode.Default, false);
+            
+            botClientMoq
+                .Setup(b => b.SendTextMessageAsync(It.IsAny<ChatId>(), It.IsAny<string>(), It.IsAny<ParseMode>(), It.IsAny<bool>(),
+                    It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<IReplyMarkup>(), It.IsAny<CancellationToken>()))
+                .Callback<ChatId, string, ParseMode, bool, bool, int, IReplyMarkup, CancellationToken>(
+                    (passedChatId, passedText, passedParseMode, passedWebPagePreviewFlag, _, _, _, _) =>
+                    {
+                        sendTextMessageAsyncArgs.chatId = passedChatId;
+                        sendTextMessageAsyncArgs.text = passedText;
+                        sendTextMessageAsyncArgs.parseMode = passedParseMode;
+                        sendTextMessageAsyncArgs.disableWebPagePreview = passedWebPagePreviewFlag;
+                    });
+
+            var handler = GetRepostHandler(update, botClient: botClientMoq.Object);
+
+            handler.HandleUpdateAsync(update).Wait();
+
+            Assert.Equal(MainChannelId.ToString(), sendTextMessageAsyncArgs.chatId.ToString());
+            Assert.Equal(expectedText, sendTextMessageAsyncArgs.text);
+            Assert.Equal(ParseMode.Html, sendTextMessageAsyncArgs.parseMode);
+            Assert.True(sendTextMessageAsyncArgs.disableWebPagePreview);
+        }
+        
+        private static Update GetTextReplyUpdate(string repostMessage, MessageEntity[]? entities = null)
         {
             var chat = new Chat
             {
@@ -156,7 +216,8 @@ namespace CommunityBotTests.Handlers
                     {
                         From = postAuthor,
                         Chat = chat,
-                        Text = repostMessage
+                        Text = repostMessage,
+                        Entities = entities
                     },
                     Text = "@PostFzCommunityBot",
                     Entities = new []
