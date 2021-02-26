@@ -63,7 +63,7 @@ namespace CommunityBot.Handlers
                 return;
             }
             
-            Logger.LogInformation($"Update {update.ToLog()} was skipped!");
+            Logger.LogInformation("Update {Update} was skipped!", update.ToLog());
         }
 
         private async Task SendPost(Message message)
@@ -119,7 +119,7 @@ namespace CommunityBot.Handlers
 
         private async Task SendMediaGroupPost(Message message)
         {
-            var media = _mediaGroupService.GetMediaByGroupId(message.MediaGroupId);
+            var media = _mediaGroupService.GetMediaByGroupId(message.MediaGroupId)?.ToArray();
 
             if (media == null)
             {
@@ -129,7 +129,7 @@ namespace CommunityBot.Handlers
 
             foreach (var inputMedia in media.Where(m => m.Caption != null).OfType<InputMediaBase>())
             {
-                message.Text = inputMedia.Caption;
+                message.Caption = inputMedia.Caption;
                 inputMedia.Caption = await PreparePost(message);
             }
             

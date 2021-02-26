@@ -125,6 +125,7 @@ namespace CommunityBot.Handlers
                 await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
                     "Вместе с коммандой необходимо приложить json файл с массивом юзеров внутри.",
                     replyToMessageId: update.Message.MessageId);
+                return;
             }
             
             await using var stream = new MemoryStream();
@@ -157,7 +158,7 @@ namespace CommunityBot.Handlers
                         await _appUserRepository.Add(user);
                     }
                 }
-                Logger.LogWarning("Следующие пользователи были добавлены или обновлены ({userCount})\n\n: {users}", users.Length, string.Join<AppUser>("\n", users));
+                Logger.LogWarning("Следующие пользователи были добавлены или обновлены ({UserCount})\n\n: {Users}", users.Length, string.Join<AppUser>("\n", users));
 
                 await BotClient.SendTextMessageAsync(update.Message.Chat.Id, 
                     $"Следующие пользователи были добавлены или обновлены ({users.Length})\n\n: {string.Join<AppUser>("\n", users)}",
@@ -165,7 +166,7 @@ namespace CommunityBot.Handlers
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Не удалось десериализовать файл: {exMessage} | {exStackTrace}", e.Message, e.StackTrace);
+                Logger.LogError(e, "Не удалось десериализовать файл: {ExMessage} | {ExStackTrace}\n\n{Json}", e.Message, e.StackTrace, json);
                 await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
                     $"Не удалось десериализовать файл: {e.Message} | {e.StackTrace}",
                     replyToMessageId: update.Message.MessageId);
