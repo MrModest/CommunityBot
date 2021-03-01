@@ -141,11 +141,16 @@ namespace CommunityBot.Handlers
             var post = new StringBuilder();
             var postText = message.GetFirstBotCommand()?.arg ?? message.Text ?? message.Caption;
 
-            postText = MessageEntityWrapper.GetMarkupMessage(
-                postText,
-                message.GetEntities(), 
-                ParseMode.Html);
-            
+            postText = postText.EncodeHtml();
+
+            if (message.GetEntities().Any())
+            {
+                postText = MessageEntityWrapper.GetMarkupMessage(
+                    postText,
+                    message.GetEntities(), 
+                    ParseMode.Html);
+            }
+
             post.Append($"{postText}\n\n");
             post.Append($" — {message.From.GetMentionHtmlLink()}");
             

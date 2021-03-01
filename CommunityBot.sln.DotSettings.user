@@ -1,7 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2bd1c76c_002Db43b_002D4342_002Da774_002Da70cd2e3f3a6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="RepostTextMessage" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::C84F5337-529A-4550-9D40-3F87095A08FE::net5.0::CommunityBotTests.Handlers.RepostMessageUpdateHandlerTests.RepostTextMessage&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::C84F5337-529A-4550-9D40-3F87095A08FE::net5.0::CommunityBotTests.Handlers.RepostMessageUpdateHandlerTests.RepostPhotoMessage&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fc5bbb71_002Ded18_002D455b_002D85bf_002D0fd91b83b2d2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;Project Location="D:\Projects\CommunityBot\CommunityBotTests" Presentation="&amp;lt;CommunityBotTests&amp;gt;" /&gt;&#xD;
+    &lt;Namespace&gt;CommunityBotTests.Handlers&lt;/Namespace&gt;&#xD;
+  &lt;/And&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

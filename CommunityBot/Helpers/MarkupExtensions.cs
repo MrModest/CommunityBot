@@ -4,9 +4,9 @@ namespace CommunityBot.Helpers
 {
     public static class MarkupExtensions
     {
-        public static string EscapeHtml(this string raw)
+        public static string EncodeHtml(this string raw)
         {
-            return raw.Replace("\n", "<br />");
+            return raw.Replace("<", "&#60;").Replace(">", "&#62;");
         }
 
         public static string ToHtmlLink(this string rawLink, string linkText)
