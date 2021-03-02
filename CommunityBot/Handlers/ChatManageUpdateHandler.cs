@@ -10,6 +10,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 using CommunityBot.Contracts;
+using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
 
 namespace CommunityBot.Handlers
@@ -40,28 +41,30 @@ namespace CommunityBot.Handlers
             return update.Message.ContainCommand(AddChatCommand, AddThisChatCommand, RemoveChatCommand, GetAllChatsCommand, GetIdOfThisChat);
         }
 
-        protected override async Task HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
         {
             var command = update.Message.GetFirstBotCommand()!.Value;
 
             switch (command.name)
             {
                 case AddChatCommand:
-                    await AddChat(command.arg, update);
-                    return;
+                    return await  AddChat(command.arg, update);
+                
                 case AddThisChatCommand:
-                    await AddThisChat(command.arg, update);
-                    return;
+                    return await  AddThisChat(command.arg, update);
+                
                 case RemoveChatCommand:
-                    await RemoveChat(command.arg, update);
-                    return;
+                    return await  RemoveChat(command.arg, update);
+                
                 case GetAllChatsCommand:
-                    await GetAllChats(update);
-                    return;
+                    return await GetAllChats(update);
+                
                 case GetIdOfThisChat:
-                    await SendMessage(update.Message.Chat.Id, $"ID этого чата: {update.Message.Chat.Id}", update.Message.MessageId);
-                    return;
-            }
+                    return new TextUpdateHandlerResult(update.Message.Chat.Id, $"ID этого чата: {update.Message.Chat.Id}", update.Message.MessageId);
+                
+                default:
+                    return new NothingUpdateHandlerResult();
+            };
         }
 
         private async Task SendMessage(long replyChatId, string text, int replyToMessageId, ParseMode parseMode = ParseMode.Default)
@@ -69,23 +72,21 @@ namespace CommunityBot.Handlers
             await BotClient.SendTextMessageAsync(replyChatId, text, replyToMessageId: replyToMessageId, disableWebPagePreview: true, parseMode: parseMode);
         }
 
-        private async Task AddChat(string chatRawArgs, Update update)
+        private async Task<IUpdateHandlerResult> AddChat(string chatRawArgs, Update update)
         {
             var arg = chatRawArgs.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
             if (arg.Length < 2)
             {
-                await SendMessage(update.Message.Chat.Id, "Неправильно отправленная команда. Пожалуйста попробуйте ещё раз или обратитесь к админам за помощью.", update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, "Неправильно отправленная команда. Пожалуйста попробуйте ещё раз или обратитесь к админам за помощью.", update.Message.MessageId);
             }
 
             if (!arg[1].StartsWith("https://t.me/joinchat/"))
             {
-                await SendMessage(
+                return new TextUpdateHandlerResult(
                     update.Message.Chat.Id,
                     "Неправильная ссылка приглашение: ссылка должна начинаться с 'https://t.me/joinchat/'. Добавлять ссылку на публичные чаты не нужно.",
                     update.Message.MessageId);
-                return;
             }
                 
             var chatName = arg[0];
@@ -93,33 +94,30 @@ namespace CommunityBot.Handlers
 
             await _chatRepository.AddOrUpdate(new SavedChat(-1, chatName, chatLink));
 
-            await SendMessage(update.Message.Chat.Id, "Чат добавлен/обновлён! Спасибо за помощь боту!", update.Message.MessageId);
+            return new TextUpdateHandlerResult(update.Message.Chat.Id, "Чат добавлен/обновлён! Спасибо за помощь боту!", update.Message.MessageId);
         }
 
-        private async Task AddThisChat(string inviteLink, Update update)
+        private async Task<IUpdateHandlerResult> AddThisChat(string inviteLink, Update update)
         {
             var chat = update.Message.Chat;
             
             if (chat.IsPrivate())
             {
-                await SendMessage(chat.Id, "Зачем ты пытаешься добавить наш личный чат в список чатов? >_>", update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(chat.Id, "Зачем ты пытаешься добавить наш личный чат в список чатов? >_>", update.Message.MessageId);
             }
 
             if (!chat.IsGroup())
             {
-                return;
+                return new TextUpdateHandlerResult(chat.Id, "Добавить можно только группу!", update.Message.MessageId);
             }
 
             if (inviteLink.IsNotBlank())
             {
                 if (!inviteLink.StartsWith("https://t.me/joinchat/"))
                 {
-                    await SendMessage(
-                        update.Message.Chat.Id,
+                    return new TextUpdateHandlerResult(chat.Id,
                         "Неправильная ссылка приглашение: ссылка должна начинаться с 'https://t.me/joinchat/'. Добавлять ссылку на публичные чаты не нужно.",
                         update.Message.MessageId);
-                    return;
                 }
                 
                 chat.InviteLink = inviteLink.Trim();
@@ -138,41 +136,39 @@ namespace CommunityBot.Handlers
 
                 if (chat.InviteLink.IsBlank())
                 {
-                    await SendMessage(chat.Id, "Или дайте мне ссылку-приглашение вместе с коммандой, или сделайте админом, чтобы я сам мог создать её.", update.Message.MessageId);
-                    return;
+                    return new TextUpdateHandlerResult(chat.Id,
+                        "Или дайте мне ссылку-приглашение вместе с коммандой, или сделайте админом, чтобы я сам мог создать её.",
+                        update.Message.MessageId);
                 }
             }
 
             await _chatRepository.AddOrUpdate(new SavedChat(chat.Id, chat.Title, chat.InviteLink));
-                
-            await SendMessage(chat.Id, "Чат добавлен! Спасибо за помощь боту!", update.Message.MessageId);
+
+            return new TextUpdateHandlerResult(chat.Id, "Чат добавлен! Спасибо за помощь боту!", update.Message.MessageId);
         }
 
-        private async Task RemoveChat(string chatExactName, Update update)
+        private async Task<IUpdateHandlerResult> RemoveChat(string chatExactName, Update update)
         {
             if (!Options.Admins.Contains(update.Message.From.Username))
             {
-                await SendMessage(update.Message.Chat.Id, "Если хочешь удалить чат из моего списка, то попроси админов.", update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, "Если хочешь удалить чат из моего списка, то попроси админов.", update.Message.MessageId);
             }
 
             if (chatExactName.IsBlank())
             {
-                await SendMessage(update.Message.Chat.Id, "Напиши рядом с командой полное имя чата, который удаляем.", update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, "Напиши рядом с командой полное имя чата, который удаляем.", update.Message.MessageId);
             }
 
             await _chatRepository.RemoveByName(chatExactName);
 
-            await SendMessage(update.Message.Chat.Id, $"Если чат с названием {chatExactName} существовал в моём списке, то я его удалил.", update.Message.MessageId);
+            return new TextUpdateHandlerResult(update.Message.Chat.Id, $"Если чат с названием {chatExactName} существовал в моём списке, то я его удалил.", update.Message.MessageId);
         }
 
-        private async Task GetAllChats(Update update)
+        private async Task<IUpdateHandlerResult> GetAllChats(Update update)
         {
             if (!IsFromAdmin(update) || !update.Message.IsPrivate())
             {
-                await SendMessage(update.Message.Chat.Id, "Смотреть список всех чатов можно только админам и только в ЛС.", update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, "Смотреть список всех чатов можно только админам и только в ЛС.", update.Message.MessageId);
             }
 
             var chats = await _chatRepository.GetAll();
@@ -185,7 +181,7 @@ namespace CommunityBot.Handlers
                 ? string.Join("\n\n", chatMarkup) 
                 : "Список чатов пуст!\nЕго можно пополнить при помощи команды /add_chat";
 
-            await SendMessage(update.Message.Chat.Id, resultMessage, update.Message.MessageId, ParseMode.Html);
+            return new TextUpdateHandlerResult(update.Message.Chat.Id, resultMessage, update.Message.MessageId, ParseMode.Html);
         }
     }
 }
