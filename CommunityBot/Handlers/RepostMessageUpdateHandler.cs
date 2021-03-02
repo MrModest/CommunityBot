@@ -131,6 +131,7 @@ namespace CommunityBot.Handlers
             {
                 message.Caption = inputMedia.Caption;
                 inputMedia.Caption = await PreparePost(message);
+                inputMedia.ParseMode = ParseMode.Html;
             }
             
             await BotClient.SendMediaGroupAsync(media, Options.MainChannelId);

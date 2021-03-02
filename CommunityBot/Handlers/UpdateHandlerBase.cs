@@ -63,6 +63,10 @@ namespace CommunityBot.Handlers
                         parseMode: videoResult.ParseMode, replyToMessageId: videoResult.ReplyToMessageId);
                     break;
                 
+                case MediaGroupUpdateHandlerResult mediaGroupResult:
+                    await BotClient.SendMediaGroupAsync(mediaGroupResult.MediaList, mediaGroupResult.ChatId, replyToMessageId: mediaGroupResult.ReplyToMessageId);
+                    break;
+                
                 case NothingUpdateHandlerResult:
                     Logger.LogTrace("Doing nothing for handler '{HandlerName}'", HandlerName);
                     break;

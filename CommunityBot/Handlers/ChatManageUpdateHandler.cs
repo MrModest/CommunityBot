@@ -48,13 +48,13 @@ namespace CommunityBot.Handlers
             switch (command.name)
             {
                 case AddChatCommand:
-                    return await  AddChat(command.arg, update);
+                    return await AddChat(command.arg, update);
                 
                 case AddThisChatCommand:
-                    return await  AddThisChat(command.arg, update);
+                    return await AddThisChat(command.arg, update);
                 
                 case RemoveChatCommand:
-                    return await  RemoveChat(command.arg, update);
+                    return await RemoveChat(command.arg, update);
                 
                 case GetAllChatsCommand:
                     return await GetAllChats(update);
@@ -65,11 +65,6 @@ namespace CommunityBot.Handlers
                 default:
                     return new NothingUpdateHandlerResult();
             };
-        }
-
-        private async Task SendMessage(long replyChatId, string text, int replyToMessageId, ParseMode parseMode = ParseMode.Default)
-        {
-            await BotClient.SendTextMessageAsync(replyChatId, text, replyToMessageId: replyToMessageId, disableWebPagePreview: true, parseMode: parseMode);
         }
 
         private async Task<IUpdateHandlerResult> AddChat(string chatRawArgs, Update update)
