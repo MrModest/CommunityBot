@@ -46,31 +46,7 @@ namespace CommunityBot.Handlers
 
             var result = await HandleUpdateInternalAsync(update);
 
-            switch (result)
-            {
-                case TextUpdateHandlerResult textResult:
-                    await BotClient.SendTextMessageAsync(textResult.ChatId, textResult.MessageText, 
-                        textResult.ParseMode, textResult.DisableWebPagePreview, replyToMessageId: textResult.ReplyToMessageId);
-                    break;
-                
-                case PhotoUpdateHandlerResult photoResult:
-                    await BotClient.SendPhotoAsync(photoResult.ChatId, photoResult.FileId, photoResult.Caption,
-                        photoResult.ParseMode, replyToMessageId: photoResult.ReplyToMessageId);
-                    break;
-                
-                case VideoUpdateHandlerResult videoResult:
-                    await BotClient.SendVideoAsync(videoResult.ChatId, videoResult.FileId, caption: videoResult.Caption,
-                        parseMode: videoResult.ParseMode, replyToMessageId: videoResult.ReplyToMessageId);
-                    break;
-                
-                case MediaGroupUpdateHandlerResult mediaGroupResult:
-                    await BotClient.SendMediaGroupAsync(mediaGroupResult.MediaList, mediaGroupResult.ChatId, replyToMessageId: mediaGroupResult.ReplyToMessageId);
-                    break;
-                
-                case NothingUpdateHandlerResult:
-                    Logger.LogTrace("Doing nothing for handler '{HandlerName}'", HandlerName);
-                    break;
-            }
+            await HandleResult(result);
             
             Logger.LogTrace("End handler: '{HandlerName}'", HandlerName);
         }
@@ -113,6 +89,51 @@ namespace CommunityBot.Handlers
             };
 
             return Options.Admins.Contains(fromUser?.Username);
+        }
+
+        private async Task HandleResult(IUpdateHandlerResult result)
+        {
+            switch (result)
+            {
+                case TextUpdateHandlerResult textResult:
+                    await BotClient.SendTextMessageAsync(textResult.ChatId, textResult.MessageText, 
+                        textResult.ParseMode, textResult.DisableWebPagePreview, replyToMessageId: textResult.ReplyToMessageId);
+                    break;
+                
+                case PhotoUpdateHandlerResult photoResult:
+                    await BotClient.SendPhotoAsync(photoResult.ChatId, photoResult.FileId, photoResult.Caption,
+                        photoResult.ParseMode, replyToMessageId: photoResult.ReplyToMessageId);
+                    break;
+                
+                case VideoUpdateHandlerResult videoResult:
+                    await BotClient.SendVideoAsync(videoResult.ChatId, videoResult.FileId, caption: videoResult.Caption,
+                        parseMode: videoResult.ParseMode, replyToMessageId: videoResult.ReplyToMessageId);
+                    break;
+                
+                case MediaGroupUpdateHandlerResult mediaGroupResult:
+                    await BotClient.SendMediaGroupAsync(mediaGroupResult.MediaList, mediaGroupResult.ChatId, 
+                        replyToMessageId: mediaGroupResult.ReplyToMessageId);
+                    break;
+                
+                case DocumentUpdateHandlerResult documentResult:
+                    await BotClient.SendDocumentAsync(documentResult.ChatId, documentResult.File, documentResult.Caption, 
+                        documentResult.ParseMode, replyToMessageId: documentResult.ReplyToMessageId);
+                    documentResult.Dispose();
+                    break;
+                
+                case AggregateUpdateHandlerResult aggregateResult:
+                    Logger.LogTrace("Start handle aggregate result ({Count})", aggregateResult.InnerResults.Length);
+                    foreach (var innerResult in aggregateResult.InnerResults)
+                    {
+                        await HandleResult(innerResult);
+                    }
+                    Logger.LogTrace("End handle aggregate result");
+                    break;
+                
+                case NothingUpdateHandlerResult:
+                    Logger.LogTrace("Doing nothing for handler '{HandlerName}'", HandlerName);
+                    break;
+            }
         }
     }
 }

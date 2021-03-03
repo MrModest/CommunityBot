@@ -9,6 +9,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 
 using CommunityBot.Contracts;
+using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
@@ -38,32 +39,26 @@ namespace CommunityBot.Handlers
             return update.Message.ContainCommand(BackupDbCommand);
         }
 
-        protected override async Task HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
         {
             if (!IsFromAdmin(update))
             {
-                await SendMessage(update.Message.Chat.Id, "Эта команда только для админов!", update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, "Эта команда только для админов!", update.Message.MessageId);
             }
 
             if (!File.Exists(_dbOptions.DbFilePath))
             {
-                await SendMessage(update.Message.Chat.Id, $"Не найден файл БД по пути '{_dbOptions.DbFilePath}'!", update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, $"Не найден файл БД по пути '{_dbOptions.DbFilePath}'!", update.Message.MessageId);
             }
 
-            await using var stream = File.Open(_dbOptions.DbFilePath, FileMode.Open);
-            InputOnlineFile iof = new InputOnlineFile(stream) {FileName = $"db_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss_zz").Replace(" ", "_")}.sqlite"};
-                
-            foreach (var debugInfoChatId in Options.DebugInfoChatIds)
-            {
-                await BotClient.SendDocumentAsync(debugInfoChatId, iof, "#backup");
-            }
-        }
-        
-        private async Task SendMessage(long replyChatId, string text, int replyToMessageId)
-        {
-            await BotClient.SendTextMessageAsync(replyChatId, text, replyToMessageId: replyToMessageId);
+            var stream = File.Open(_dbOptions.DbFilePath, FileMode.Open);
+
+            var fileName = $"db_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss_zz").Replace(" ", "_")}.sqlite";
+
+            var results = Options.DebugInfoChatIds.Select(chatId =>
+                new DocumentUpdateHandlerResult(chatId, stream, fileName, "#backup"));
+
+            return new AggregateUpdateHandlerResult(results);
         }
     }
 }

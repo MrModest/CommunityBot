@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
+using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ namespace CommunityBot.Handlers
             return update.Message.MediaGroupId.IsNotBlank();
         }
 
-        protected override Task HandleUpdateInternalAsync(Update update)
+        protected async override Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
         {
             var media = update.Message.ToInputMedia();
 
@@ -40,7 +41,7 @@ namespace CommunityBot.Handlers
             
             Logger.LogInformation("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
             
-            return Task.CompletedTask;
+            return new NothingUpdateHandlerResult();
         }
     }
 }

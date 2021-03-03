@@ -4,8 +4,8 @@ namespace CommunityBot.Handlers.Results
 {
     public abstract class MediaUpdateHandlerResult : UpdateHandlerResultBase
     {
-        public MediaUpdateHandlerResult(long chatId, string text, string fileId, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)
-            : base(chatId, text, parseMode, replyToMessageId)
+        public MediaUpdateHandlerResult(long chatId, string fileId, string caption, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)
+            : base(chatId, caption, parseMode, replyToMessageId)
         {
             FileId = fileId;
         }
@@ -17,16 +17,16 @@ namespace CommunityBot.Handlers.Results
 
     public class PhotoUpdateHandlerResult : MediaUpdateHandlerResult
     {
-        public PhotoUpdateHandlerResult(long chatId, string text, string fileId, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)
-            : base(chatId, text, fileId, parseMode, replyToMessageId)
+        public PhotoUpdateHandlerResult(long chatId, string fileId, string caption, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)
+            : base(chatId, fileId, caption, parseMode, replyToMessageId)
         {
         }
     }
     
     public class VideoUpdateHandlerResult : MediaUpdateHandlerResult
     {
-        public VideoUpdateHandlerResult(long chatId, string text, string fileId, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)
-            : base(chatId, text, fileId, parseMode, replyToMessageId)
+        public VideoUpdateHandlerResult(long chatId, string fileId, string caption, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)
+            : base(chatId, fileId, caption, parseMode, replyToMessageId)
         {
         }
     }

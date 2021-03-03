@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
+using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
 using CommunityBot.Services;
 using Microsoft.Extensions.Logging;
@@ -36,7 +37,7 @@ namespace CommunityBot.Handlers
             return _inMemorySettingsService.GetSettingCollectUserInfo() && update.Message.From != null;
         }
 
-        protected override async Task HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
         {
             var isExisted = await _appUserRepository.IsExisted(update.Message.From.Id);
 
@@ -44,6 +45,8 @@ namespace CommunityBot.Handlers
             {
                 await _appUserRepository.Add(update.Message.From.ToAppUser());
             }
+
+            return new NothingUpdateHandlerResult();
         }
     }
 }

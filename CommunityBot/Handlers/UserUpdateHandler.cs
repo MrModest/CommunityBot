@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
+using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
 using CommunityBot.Services;
 using Microsoft.Extensions.Logging;
@@ -41,32 +42,31 @@ namespace CommunityBot.Handlers
                    update.Message.ContainCommand(SetPasswordCommand, CollectUserInfoCommand, AddUsersFromJsonCommand);
         }
 
-        protected override async Task HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
         {
             var command = update.Message.GetFirstBotCommand()!.Value;
 
             switch (command.name)
             {
                 case SetPasswordCommand:
-                    await SetPassword(update, command.arg);
-                    break;
+                    return await SetPassword(update, command.arg);
                 case CollectUserInfoCommand:
-                    await SetCollectUserInfoSetting(update, command.arg);
-                    break;
+                    return await SetCollectUserInfoSetting(update, command.arg);
                 case AddUsersFromJsonCommand:
-                    await AddUsersFromJson(update);
-                    break;
+                    return await AddUsersFromJson(update);
+                
+                default:
+                    return new NothingUpdateHandlerResult();
             }
         }
 
-        private async Task SetPassword(Update update, string password)
+        private async Task<IUpdateHandlerResult> SetPassword(Update update, string password)
         {
             if (password.IsBlank())
             {
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                return new TextUpdateHandlerResult(update.Message.Chat.Id,
                     "Пожалуйста, введите свой пароль сразу после команды! Например '/set_password 123'",
-                    replyToMessageId: update.Message.MessageId);
-                return;
+                    update.Message.MessageId);
             }
 
             var appUser = await _appUserRepository.Get(update.Message.From.Id);
@@ -79,59 +79,55 @@ namespace CommunityBot.Handlers
             appUser.PasswordHash = StringExtensions.CreateMd5(password);
             await _appUserRepository.Update(appUser);
             
-            await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+            return new TextUpdateHandlerResult(update.Message.Chat.Id,
                 $"Пароль обновлён! Ваш новый пароль: <code>{password}</code>\n" +
                 "Из пароля были удалены пробелы в начале и в конце, если они были.",
-                replyToMessageId: update.Message.MessageId, parseMode: ParseMode.Html);
+                update.Message.MessageId, ParseMode.Html);
         }
 
-        private async Task SetCollectUserInfoSetting(Update update, string value)
+        private async Task<IUpdateHandlerResult> SetCollectUserInfoSetting(Update update, string value)
         {
             if (!IsFromAdmin(update))
             {
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                return new TextUpdateHandlerResult(update.Message.Chat.Id,
                     "Данная команда доступна только администраторам!",
-                    replyToMessageId: update.Message.MessageId);
-                return;
+                    update.Message.MessageId);
             }
                 
             if (value.IsBlank() || value.NotIn("on", "off"))
             {
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                return new TextUpdateHandlerResult(update.Message.Chat.Id,
                     "Пожалуйста, добавьте после комманды 'on' или 'off' для понимания: включить или выключить.",
-                    replyToMessageId: update.Message.MessageId);
-                return;
+                    update.Message.MessageId);
             }
 
             _inMemorySettingsService.SetSettingCollectUserInfo(value == "on");
             
-            await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+            return new TextUpdateHandlerResult(update.Message.Chat.Id,
                 "Значение обновлено!",
-                replyToMessageId: update.Message.MessageId);
+                update.Message.MessageId);
         }
 
-        private async Task AddUsersFromJson(Update update)
+        private async Task<IUpdateHandlerResult> AddUsersFromJson(Update update)
         {
             if (!IsFromAdmin(update))
             {
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                return new TextUpdateHandlerResult(update.Message.Chat.Id,
                     "Данная команда доступна только администраторам!",
-                    replyToMessageId: update.Message.MessageId);
-                return;
+                    update.Message.MessageId);
             }
             
             if (update.Message.Type != MessageType.Document)
             {
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                return new TextUpdateHandlerResult(update.Message.Chat.Id,
                     "Вместе с коммандой необходимо приложить json файл с массивом юзеров внутри.",
-                    replyToMessageId: update.Message.MessageId);
-                return;
+                    update.Message.MessageId);
             }
             
             await using var stream = new MemoryStream();
             await BotClient.GetInfoAndDownloadFileAsync(update.Message.Document.FileId, stream);
 
-            if (stream.Position != 0)
+            if (stream.Position != 0) 
             {
                 if (!stream.CanSeek)
                 {
@@ -160,16 +156,16 @@ namespace CommunityBot.Handlers
                 }
                 Logger.LogWarning("Следующие пользователи были добавлены или обновлены ({UserCount})\n\n: {Users}", users.Length, string.Join<AppUser>("\n", users));
 
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id, 
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, 
                     $"Следующие пользователи были добавлены или обновлены ({users.Length})\n\n: {string.Join<AppUser>("\n", users)}",
-                    replyToMessageId: update.Message.MessageId);
+                    update.Message.MessageId);
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Не удалось десериализовать файл: {ExMessage} | {ExStackTrace}\n\n{Json}", e.Message, e.StackTrace, json);
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                return new TextUpdateHandlerResult(update.Message.Chat.Id,
                     $"Не удалось десериализовать файл: {e.Message} | {e.StackTrace}",
-                    replyToMessageId: update.Message.MessageId);
+                    update.Message.MessageId);
             }
         }
     }

@@ -6,6 +6,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using CommunityBot.Contracts;
+using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
 using Microsoft.Extensions.Logging;
 
@@ -50,17 +51,18 @@ namespace CommunityBot.Handlers
         }
 
         //ToDo: may be need change concept (/help <commandName>) and don't touch command with empty args
-        protected override async Task HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
         {
             var command = update.Message.GetFirstBotCommand();
 
             if (infoDict.TryGetValue(command?.name ?? string.Empty, out var text))
             {
-                await BotClient.SendTextMessageAsync(update.Message.Chat.Id, text, ParseMode.Html, replyToMessageId: update.Message.MessageId);
-                return;
+                return new TextUpdateHandlerResult(update.Message.Chat.Id, text, update.Message.MessageId, ParseMode.Html);
             }
                 
-            Logger.LogInformation($"Command {command?.name} was skipped because not found in infoDict.");
+            Logger.LogInformation("Command {CommandName} was skipped because not found in infoDict", command?.name);
+
+            return new NothingUpdateHandlerResult();
         }
     }
 }
