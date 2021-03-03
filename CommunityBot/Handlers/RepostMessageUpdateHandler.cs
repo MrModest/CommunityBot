@@ -94,7 +94,7 @@ namespace CommunityBot.Handlers
         {
             var text = await PreparePost(message);
             
-            return Result.FromText(Options.MainChannelId, text, ParseMode.Html, true);
+            return Result.Text(Options.MainChannelId, text, ParseMode.Html, true);
         }
 
         private async Task<IUpdateHandlerResult> SendPhotoVideoPost(Message message)
@@ -107,10 +107,10 @@ namespace CommunityBot.Handlers
                 {
                     var photo = message.Photo.GetLargestPhotoSize().FileId;
                 
-                    return Result.FromPhoto(Options.MainChannelId, photo, caption, ParseMode.Html);
+                    return Result.Photo(Options.MainChannelId, photo, caption, ParseMode.Html);
                 }
                 case MessageType.Video:
-                    return Result.FromVideo(Options.MainChannelId, message.Video.FileId, caption, ParseMode.Html);
+                    return Result.Video(Options.MainChannelId, message.Video.FileId, caption, ParseMode.Html);
                 
                 default:
                     throw new InvalidOperationException($"Not supported MessageType: {message.Type}");
@@ -134,7 +134,7 @@ namespace CommunityBot.Handlers
                 inputMedia.ParseMode = ParseMode.Html;
             }
             
-            return Result.FromMediaGroup(Options.MainChannelId, media);
+            return Result.MediaGroup(Options.MainChannelId, media);
         }
 
         private async Task<string> PreparePost(Message message)
