@@ -56,7 +56,7 @@ namespace CommunityBot.Handlers
                     return await AddUsersFromJson(update);
                 
                 default:
-                    return new NothingUpdateHandlerResult();
+                    return Result.Nothing();
             }
         }
 
@@ -64,7 +64,7 @@ namespace CommunityBot.Handlers
         {
             if (password.IsBlank())
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id,
+                return Result.FromText(update.Message.Chat.Id,
                     "Пожалуйста, введите свой пароль сразу после команды! Например '/set_password 123'",
                     update.Message.MessageId);
             }
@@ -79,7 +79,7 @@ namespace CommunityBot.Handlers
             appUser.PasswordHash = StringExtensions.CreateMd5(password);
             await _appUserRepository.Update(appUser);
             
-            return new TextUpdateHandlerResult(update.Message.Chat.Id,
+            return Result.FromText(update.Message.Chat.Id,
                 $"Пароль обновлён! Ваш новый пароль: <code>{password}</code>\n" +
                 "Из пароля были удалены пробелы в начале и в конце, если они были.",
                 update.Message.MessageId, ParseMode.Html);
@@ -89,21 +89,21 @@ namespace CommunityBot.Handlers
         {
             if (!IsFromAdmin(update))
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id,
+                return Result.FromText(update.Message.Chat.Id,
                     "Данная команда доступна только администраторам!",
                     update.Message.MessageId);
             }
                 
             if (value.IsBlank() || value.NotIn("on", "off"))
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id,
+                return Result.FromText(update.Message.Chat.Id,
                     "Пожалуйста, добавьте после комманды 'on' или 'off' для понимания: включить или выключить.",
                     update.Message.MessageId);
             }
 
             _inMemorySettingsService.SetSettingCollectUserInfo(value == "on");
             
-            return new TextUpdateHandlerResult(update.Message.Chat.Id,
+            return Result.FromText(update.Message.Chat.Id,
                 "Значение обновлено!",
                 update.Message.MessageId);
         }
@@ -112,14 +112,14 @@ namespace CommunityBot.Handlers
         {
             if (!IsFromAdmin(update))
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id,
+                return Result.FromText(update.Message.Chat.Id,
                     "Данная команда доступна только администраторам!",
                     update.Message.MessageId);
             }
             
             if (update.Message.Type != MessageType.Document)
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id,
+                return Result.FromText(update.Message.Chat.Id,
                     "Вместе с коммандой необходимо приложить json файл с массивом юзеров внутри.",
                     update.Message.MessageId);
             }
@@ -156,14 +156,14 @@ namespace CommunityBot.Handlers
                 }
                 Logger.LogWarning("Следующие пользователи были добавлены или обновлены ({UserCount})\n\n: {Users}", users.Length, string.Join<AppUser>("\n", users));
 
-                return new TextUpdateHandlerResult(update.Message.Chat.Id, 
+                return Result.FromText(update.Message.Chat.Id, 
                     $"Следующие пользователи были добавлены или обновлены ({users.Length})\n\n: {string.Join<AppUser>("\n", users)}",
                     update.Message.MessageId);
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Не удалось десериализовать файл: {ExMessage} | {ExStackTrace}\n\n{Json}", e.Message, e.StackTrace, json);
-                return new TextUpdateHandlerResult(update.Message.Chat.Id,
+                return Result.FromText(update.Message.Chat.Id,
                     $"Не удалось десериализовать файл: {e.Message} | {e.StackTrace}",
                     update.Message.MessageId);
             }

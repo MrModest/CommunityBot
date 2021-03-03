@@ -46,7 +46,7 @@ namespace CommunityBot.Handlers
                 await _appUserRepository.Add(update.Message.From.ToAppUser());
             }
 
-            return new NothingUpdateHandlerResult();
+            return Result.Nothing();
         }
     }
 }

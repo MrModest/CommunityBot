@@ -65,7 +65,7 @@ namespace CommunityBot.Handlers
             
             Logger.LogInformation("Update {Update} was skipped!", update.ToLog());
 
-            return new NothingUpdateHandlerResult();
+            return Result.Nothing();
         }
 
         private async Task<IUpdateHandlerResult> SendPost(Message message)
@@ -86,7 +86,7 @@ namespace CommunityBot.Handlers
                     }
                 
                 default:
-                    return new NothingUpdateHandlerResult();
+                    return Result.Nothing();
             }
         }
 
@@ -94,7 +94,7 @@ namespace CommunityBot.Handlers
         {
             var text = await PreparePost(message);
             
-            return new TextUpdateHandlerResult(Options.MainChannelId, text, ParseMode.Html, true);
+            return Result.FromText(Options.MainChannelId, text, ParseMode.Html, true);
         }
 
         private async Task<IUpdateHandlerResult> SendPhotoVideoPost(Message message)
@@ -107,10 +107,10 @@ namespace CommunityBot.Handlers
                 {
                     var photo = message.Photo.GetLargestPhotoSize().FileId;
                 
-                    return new PhotoUpdateHandlerResult(Options.MainChannelId, photo, caption, ParseMode.Html);
+                    return Result.FromPhoto(Options.MainChannelId, photo, caption, ParseMode.Html);
                 }
                 case MessageType.Video:
-                    return new VideoUpdateHandlerResult(Options.MainChannelId, message.Video.FileId, caption, ParseMode.Html);
+                    return Result.FromVideo(Options.MainChannelId, message.Video.FileId, caption, ParseMode.Html);
                 
                 default:
                     throw new InvalidOperationException($"Not supported MessageType: {message.Type}");
@@ -124,7 +124,7 @@ namespace CommunityBot.Handlers
             if (media == null)
             {
                 Logger.LogWarning("Post was not send because not found media group with id '{Id}'", message.MediaGroupId);
-                return new NothingUpdateHandlerResult();
+                return Result.Nothing();
             }
 
             foreach (var inputMedia in media.Where(m => m.Caption != null).OfType<InputMediaBase>())
@@ -134,7 +134,7 @@ namespace CommunityBot.Handlers
                 inputMedia.ParseMode = ParseMode.Html;
             }
             
-            return new MediaGroupUpdateHandlerResult(Options.MainChannelId, media);
+            return Result.FromMediaGroup(Options.MainChannelId, media);
         }
 
         private async Task<string> PreparePost(Message message)

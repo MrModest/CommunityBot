@@ -41,7 +41,7 @@ namespace CommunityBot.Handlers
             
             Logger.LogInformation("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
             
-            return new NothingUpdateHandlerResult();
+            return Result.Nothing();
         }
     }
 }

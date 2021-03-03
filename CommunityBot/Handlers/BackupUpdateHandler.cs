@@ -43,12 +43,12 @@ namespace CommunityBot.Handlers
         {
             if (!IsFromAdmin(update))
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id, "Эта команда только для админов!", update.Message.MessageId);
+                return Result.FromText(update.Message.Chat.Id, "Эта команда только для админов!", update.Message.MessageId);
             }
 
             if (!File.Exists(_dbOptions.DbFilePath))
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id, $"Не найден файл БД по пути '{_dbOptions.DbFilePath}'!", update.Message.MessageId);
+                return Result.FromText(update.Message.Chat.Id, $"Не найден файл БД по пути '{_dbOptions.DbFilePath}'!", update.Message.MessageId);
             }
 
             var stream = File.Open(_dbOptions.DbFilePath, FileMode.Open);
@@ -56,9 +56,9 @@ namespace CommunityBot.Handlers
             var fileName = $"db_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss_zz").Replace(" ", "_")}.sqlite";
 
             var results = Options.DebugInfoChatIds.Select(chatId =>
-                new DocumentUpdateHandlerResult(chatId, stream, fileName, "#backup"));
+                Result.FromDocument(chatId, stream, fileName, "#backup"));
 
-            return new AggregateUpdateHandlerResult(results);
+            return Result.FromInner(results);
         }
     }
 }

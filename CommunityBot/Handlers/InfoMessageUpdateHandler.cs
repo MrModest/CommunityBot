@@ -57,12 +57,12 @@ namespace CommunityBot.Handlers
 
             if (infoDict.TryGetValue(command?.name ?? string.Empty, out var text))
             {
-                return new TextUpdateHandlerResult(update.Message.Chat.Id, text, update.Message.MessageId, ParseMode.Html);
+                return Result.FromText(update.Message.Chat.Id, text, update.Message.MessageId, ParseMode.Html);
             }
                 
             Logger.LogInformation("Command {CommandName} was skipped because not found in infoDict", command?.name);
 
-            return new NothingUpdateHandlerResult();
+            return Result.Nothing();
         }
     }
 }
