@@ -21,6 +21,7 @@ namespace CommunityBot.Handlers
         private const string SetPasswordCommand = "set_password";
         private const string CollectUserInfoCommand = "collect_user_info";
         private const string AddUsersFromJsonCommand = "add_users_from_json";
+        private const string ShowAdminsCommand = "show_admins"; 
 
         public UserUpdateHandler(
             ITelegramBotClient botClient,
@@ -38,7 +39,7 @@ namespace CommunityBot.Handlers
         protected override bool CanHandle(Update update)
         {
             return update.Message.IsPrivate() &&
-                   update.Message.ContainCommand(SetPasswordCommand, CollectUserInfoCommand, AddUsersFromJsonCommand);
+                   update.Message.ContainCommand(SetPasswordCommand, CollectUserInfoCommand, AddUsersFromJsonCommand, ShowAdminsCommand);
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)
@@ -55,6 +56,9 @@ namespace CommunityBot.Handlers
                     break;
                 case AddUsersFromJsonCommand:
                     await AddUsersFromJson(update);
+                    break;
+                case ShowAdminsCommand:
+                    await ShowAdmins(update);
                     break;
             }
         }
@@ -171,6 +175,15 @@ namespace CommunityBot.Handlers
                     $"Не удалось десериализовать файл: {e.Message} | {e.StackTrace}",
                     replyToMessageId: update.Message.MessageId);
             }
+        }
+
+        private async Task ShowAdmins(Update update)
+        {
+            await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                $"Список логинов админов бота: \n\n{string.Join("\n@", Options.Admins)}\n\n" +
+                $"Твой логин: @{update.Message.From.Username}\n\n" + 
+                $"Ты {(IsFromAdmin(update) ? "" : "не ")}админ.",
+                replyToMessageId: update.Message.MessageId);
         }
     }
 }
