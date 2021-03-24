@@ -37,7 +37,7 @@ namespace CommunityBot.Handlers
             return _inMemorySettingsService.GetSettingCollectUserInfo() && update.Message.From != null;
         }
 
-        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
         {
             var isExisted = await _appUserRepository.IsExisted(update.Message.From.Id);
 

@@ -44,7 +44,7 @@ namespace CommunityBot.Handlers
                    update.Message.HasMentionOfUserName(Options.BotName);
         }
 
-        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
         {
             Message? message = null;
             

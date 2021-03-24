@@ -39,16 +39,16 @@ namespace CommunityBot.Handlers
             return update.Message.ContainCommand(BackupDbCommand);
         }
 
-        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
+        protected override Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
         {
             if (!IsFromAdmin(update))
             {
-                return Result.Text(update.Message.Chat.Id, "Эта команда только для админов!", update.Message.MessageId);
+                return Result.Text(update.Message.Chat.Id, "Эта команда только для админов!", update.Message.MessageId).AsTask();
             }
 
             if (!File.Exists(_dbOptions.DbFilePath))
             {
-                return Result.Text(update.Message.Chat.Id, $"Не найден файл БД по пути '{_dbOptions.DbFilePath}'!", update.Message.MessageId);
+                return Result.Text(update.Message.Chat.Id, $"Не найден файл БД по пути '{_dbOptions.DbFilePath}'!", update.Message.MessageId).AsTask();
             }
 
             var stream = File.Open(_dbOptions.DbFilePath, FileMode.Open);
@@ -58,7 +58,7 @@ namespace CommunityBot.Handlers
             var results = Options.DebugInfoChatIds.Select(chatId =>
                 Result.Document(chatId, stream, fileName, "#backup"));
 
-            return Result.Inners(results);
+            return Result.Inners(results).AsTask();
         }
     }
 }

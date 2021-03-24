@@ -30,7 +30,7 @@ namespace CommunityBot.Handlers
             return update.Message.MediaGroupId.IsNotBlank();
         }
 
-        protected async override Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
+        protected override Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
         {
             var media = update.Message.ToInputMedia();
 
@@ -41,7 +41,7 @@ namespace CommunityBot.Handlers
             
             Logger.LogInformation("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
             
-            return Result.Nothing();
+            return Result.Nothing().AsTask();
         }
     }
 }

@@ -30,6 +30,16 @@ namespace CommunityBot.Handlers
             Logger = logger;
         }
         
+        protected UpdateHandlerBase(
+            ITelegramBotClient botClient,
+            IOptions<BotConfigurationOptions> options,
+            ILoggerFactory loggerFactory)
+        {
+            BotClient = botClient;
+            Options = options.Value;
+            Logger = loggerFactory.CreateLogger(GetType());
+        }
+        
         protected abstract UpdateType[] AllowedUpdates { get; }
 
         public virtual int OrderNumber => 0;
@@ -44,7 +54,7 @@ namespace CommunityBot.Handlers
             
             Logger.LogTrace("Start handler: '{HandlerName}' | {Update}", HandlerName, update.ToLog());
 
-            var result = await HandleUpdateInternalAsync(update);
+            var result = await HandleUpdateInternal(update);
 
             await HandleResult(result);
             
@@ -61,7 +71,7 @@ namespace CommunityBot.Handlers
 
         protected abstract bool CanHandle(Update update);
         
-        protected abstract Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update);
+        protected abstract Task<IUpdateHandlerResult> HandleUpdateInternal(Update update);
 
         protected virtual async Task HandleErrorInternalAsync(Exception exception, Update? update = null)
         {

@@ -42,7 +42,7 @@ namespace CommunityBot.Handlers
                    update.Message.ContainCommand(SetPasswordCommand, CollectUserInfoCommand, AddUsersFromJsonCommand);
         }
 
-        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
         {
             var command = update.Message.GetFirstBotCommand()!.Value;
 
@@ -85,27 +85,27 @@ namespace CommunityBot.Handlers
                 update.Message.MessageId, ParseMode.Html);
         }
 
-        private async Task<IUpdateHandlerResult> SetCollectUserInfoSetting(Update update, string value)
+        private Task<IUpdateHandlerResult> SetCollectUserInfoSetting(Update update, string value)
         {
             if (!IsFromAdmin(update))
             {
                 return Result.Text(update.Message.Chat.Id,
                     "Данная команда доступна только администраторам!",
-                    update.Message.MessageId);
+                    update.Message.MessageId).AsTask();
             }
                 
             if (value.IsBlank() || value.NotIn("on", "off"))
             {
                 return Result.Text(update.Message.Chat.Id,
                     "Пожалуйста, добавьте после комманды 'on' или 'off' для понимания: включить или выключить.",
-                    update.Message.MessageId);
+                    update.Message.MessageId).AsTask();
             }
 
             _inMemorySettingsService.SetSettingCollectUserInfo(value == "on");
             
             return Result.Text(update.Message.Chat.Id,
                 "Значение обновлено!",
-                update.Message.MessageId);
+                update.Message.MessageId).AsTask();
         }
 
         private async Task<IUpdateHandlerResult> AddUsersFromJson(Update update)

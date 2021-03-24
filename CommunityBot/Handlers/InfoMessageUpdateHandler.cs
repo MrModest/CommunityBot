@@ -51,18 +51,18 @@ namespace CommunityBot.Handlers
         }
 
         //ToDo: may be need change concept (/help <commandName>) and don't touch command with empty args
-        protected override async Task<IUpdateHandlerResult> HandleUpdateInternalAsync(Update update)
+        protected override Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
         {
             var command = update.Message.GetFirstBotCommand();
 
             if (infoDict.TryGetValue(command?.name ?? string.Empty, out var text))
             {
-                return Result.Text(update.Message.Chat.Id, text, update.Message.MessageId, ParseMode.Html);
+                return Result.Text(update.Message.Chat.Id, text, update.Message.MessageId, ParseMode.Html).AsTask();
             }
                 
             Logger.LogInformation("Command {CommandName} was skipped because not found in infoDict", command?.name);
 
-            return Result.Nothing();
+            return Result.Nothing().AsTask();
         }
     }
 }
