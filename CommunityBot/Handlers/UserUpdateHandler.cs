@@ -162,8 +162,10 @@ namespace CommunityBot.Handlers
                         await _appUserRepository.Add(user);
                     }
                 }
+                //ToDo: укороти, слишком длинно!. Плюс в логах почему-то json'ы, а не ToString
                 Logger.LogWarning("Следующие пользователи были добавлены или обновлены ({UserCount})\n\n: {Users}", users.Length, string.Join<AppUser>("\n", users));
 
+                //ToDo: тут тоже
                 await BotClient.SendTextMessageAsync(update.Message.Chat.Id, 
                     $"Следующие пользователи были добавлены или обновлены ({users.Length})\n\n: {string.Join<AppUser>("\n", users)}",
                     replyToMessageId: update.Message.MessageId);
