@@ -2,13 +2,14 @@
 using System.Data.SQLite;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
+using Microsoft.Extensions.Options;
 
 namespace CommunityBot.Persistence
 {
     public class SqliteChatRepository : RepositoryBase<SavedChat>, IChatRepository
     {
-        public SqliteChatRepository(SQLiteConnection connection) 
-            : base(connection)
+        public SqliteChatRepository(IOptions<SQLiteConfigurationOptions> options) 
+            : base(options.Value.DbFilePath)
         {
         }
         

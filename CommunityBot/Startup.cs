@@ -24,7 +24,6 @@ namespace CommunityBot
             services
                 .AddConfigurationOptions(Configuration)
                 .AddMemoryCache()
-                .AddSqliteDatabase()
                 .AddTelegramBotClient()
                 .AddUpdateHandlers()
                 .AddServices();

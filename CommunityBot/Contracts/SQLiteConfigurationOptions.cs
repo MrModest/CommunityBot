@@ -5,5 +5,7 @@ namespace CommunityBot.Contracts
         public const string SectionName = "SQLite";
         
         public string DbFilePath { get; set; } = null!;
+        
+        public string LogDbFilePath { get; set; } = null!;
     }
 }

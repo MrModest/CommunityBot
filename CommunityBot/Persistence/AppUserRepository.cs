@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
+using Microsoft.Extensions.Options;
 
 namespace CommunityBot.Persistence
 {
@@ -11,9 +12,8 @@ namespace CommunityBot.Persistence
     {
         private ConcurrentBag<long>? _existedUserIds;
 
-        public AppUserRepository(
-            SQLiteConnection connection)
-            : base(connection)
+        public AppUserRepository(IOptions<SQLiteConfigurationOptions> options)
+            : base(options.Value.DbFilePath)
         {
         }
 

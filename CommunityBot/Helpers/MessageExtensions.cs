@@ -39,6 +39,13 @@ namespace CommunityBot.Helpers
                 ? message.Entities.EmptyIfNull() 
                 : message.CaptionEntities.EmptyIfNull();
         }
+
+        public static string GetTextOrCaption(this Message message)
+        {
+            return message.Type == MessageType.Text 
+                ? message.Text 
+                : message.Caption;
+        }
         
         public static (string name, string arg)? GetFirstBotCommand(this Message message)
         {
@@ -50,9 +57,7 @@ namespace CommunityBot.Helpers
                 return null;
             }
 
-            var text = message.Type == MessageType.Text
-                ? message.Text
-                : message.Caption;
+            var text = message.GetTextOrCaption();
 
             return (
                 name: text.Substring(entity.Offset + 1, entity.Length - 1),
@@ -69,7 +74,7 @@ namespace CommunityBot.Helpers
         {
             return message.GetEntities()
                 .Where(e => e.Type == MessageEntityType.Mention)
-                .Select(e => message.Text.Substring(e.Offset + 1, e.Length - 1))
+                .Select(e => message.GetTextOrCaption().Substring(e.Offset + 1, e.Length - 1))
                 .ToArray();
         }
         

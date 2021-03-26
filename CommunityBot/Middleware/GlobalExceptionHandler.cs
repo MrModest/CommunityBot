@@ -24,7 +24,7 @@ namespace CommunityBot.Middleware
             }
             catch (Exception e)
             {
-                _logger.LogError("Caught exception:\n\n{type}\n\"{message}\"\n{stackTrace}", e.GetType().FullName, e.Message, e.StackTrace);
+                _logger.LogError(e, "Caught exception:\n\n{type}\n\"{message}\"\n{stackTrace}", e.GetType().FullName, e.Message, e.StackTrace);
             }
         }
     }

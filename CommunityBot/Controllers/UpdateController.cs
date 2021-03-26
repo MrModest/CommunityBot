@@ -1,10 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using CommunityBot.Contracts;
-using CommunityBot.Helpers;
 using CommunityBot.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Telegram.Bot.Types;
 
 namespace CommunityBot.Controllers

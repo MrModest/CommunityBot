@@ -56,39 +56,28 @@ namespace CommunityBot.Helpers
                 .AddSingleton<BotService>()
                 .AddSingleton<IChatRepository, SqliteChatRepository>()
                 .AddSingleton<IAppUserRepository, AppUserRepository>()
+                .AddSingleton<ILogRepository, LogRepository>()
                 .AddSingleton<IMediaGroupService, MediaGroupService>()
                 .AddSingleton<InMemorySettingsService>();
-        }
-        
-        public static IServiceCollection AddSqliteDatabase(this IServiceCollection services)
-        {
-            return services.AddSingleton(provider =>
-            {
-                var options = provider.GetRequiredService<IOptions<SQLiteConfigurationOptions>>().Value;
-                
-                var connection = new SQLiteConnection($"DataSource=\"{options.DbFilePath}\";");
-                connection.Open();
-                
-                EnsureDatabase(connection);
-                
-                return connection;
-            });
         }
 
         public static void ConfigureSerilog(HostBuilderContext hostBuilderContext, ILoggingBuilder loggingBuilder)
         {    
             var configuration = hostBuilderContext.Configuration;
-            var loggerConfiguration = new LoggerConfiguration();
             
-            /*loggerConfiguration = loggerConfiguration
-                .WriteTo
-                .File(configuration.GetSection("Logging:FilePath").Value);*/
+            var logDir = configuration.GetSection("Logging:LogDir").Value;
 
-            var pathFormat = Path.Combine(configuration.GetSection("Logging:LogDir").Value, "log-{Date}.txt");
+            var loggerConfiguration = new LoggerConfiguration()
+                .WriteTo
+                .RollingFile(Path.Combine(logDir, "log-{Date}.txt"));
+            
+            
+            var logDbFilePath = configuration.GetSection("SQLite:LogDbFilePath").Value;
 
             loggerConfiguration = loggerConfiguration
                 .WriteTo
-                .RollingFile(pathFormat);
+                .SQLite(logDbFilePath);
+            
 
             var telegramApiKey = configuration.GetSection("BotConfiguration:BotToken").Value;
             var debugInfoChatIds = configuration.GetSection("BotConfiguration:DebugInfoChatIds").Get<long[]>();
@@ -103,40 +92,6 @@ namespace CommunityBot.Helpers
             loggingBuilder.AddSerilog(loggerConfiguration.CreateLogger());
         }
 
-        private static void EnsureDatabase(SQLiteConnection connection)
-        {
-            var appTableNames = new[] {"SavedChats", "Users"};
-            
-            var tableNames = connection.Query<string>("SELECT name FROM sqlite_master WHERE type='table';");
-
-            foreach (var tableName in appTableNames.Except(tableNames))
-            {
-                if (tableName == "SavedChats")
-                {
-                    connection.Execute(@"CREATE TABLE IF NOT EXISTS main.SavedChats (
-                                            Id        INT  NOT NULL PRIMARY KEY, 
-                                            ChatId    INT  NOT NULL, 
-                                            ExactName TEXT NOT NULL, 
-                                            JoinLink  TEXT NOT NULL);");
-                    connection.Execute("CREATE INDEX IF NOT EXISTS main.ExactName_desc ON SavedChats (ExactName DESC);");
-                }
-
-                if (tableName == "Users")
-                {
-                    connection.Execute(@"CREATE TABLE IF NOT EXISTS main.Users (
-                                            Id            INT  NOT NULL PRIMARY KEY, 
-                                            Username      TEXT DEFAULT NULL, 
-                                            FirstName     TEXT DEFAULT NULL, 
-                                            LastName      TEXT DEFAULT NULL, 
-                                            InvitedBy     INT  DEFAULT NULL, 
-                                            InviteComment TEXT DEFAULT NULL, 
-                                            AccessType    TEXT NOT NULL,
-                                            PasswordHash  TEXT DEFAULT NULL);");
-                    
-                    connection.Execute("CREATE INDEX IF NOT EXISTS main.Username_desc   ON Users (Username DESC);");
-                    connection.Execute("CREATE INDEX IF NOT EXISTS main.AccessType_desc ON Users (AccessType DESC);");
-                }
-            }
-        }
+        
     }
 }

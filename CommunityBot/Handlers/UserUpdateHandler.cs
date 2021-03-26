@@ -182,7 +182,7 @@ namespace CommunityBot.Handlers
         private async Task ShowAdmins(Update update)
         {
             await BotClient.SendTextMessageAsync(update.Message.Chat.Id,
-                $"Список логинов админов бота: \n\n{string.Join("\n@", Options.Admins)}\n\n" +
+                $"Список логинов админов бота: \n\n{string.Join("\n", Options.Admins)}\n\n" +
                 $"Твой логин: @{update.Message.From.Username}\n\n" + 
                 $"Ты {(IsFromAdmin(update) ? "" : "не ")}админ.",
                 replyToMessageId: update.Message.MessageId);

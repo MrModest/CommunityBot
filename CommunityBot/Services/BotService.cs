@@ -81,20 +81,23 @@ namespace CommunityBot.Services
 
         public async Task HandleUpdate(Update update)
         {
-            _logger.LogTrace("Received update {update}", update.ToLog());
-            
-            foreach (var updateHandler in _updateHandlers.OrderByDescending(uh => uh.OrderNumber))
+            _logger.LogTrace("Received update {Update}", update.ToLog());
+
+            using (_logger.AddContext("UpdateId", update.Id))
             {
-                try
+                foreach (var updateHandler in _updateHandlers.OrderByDescending(uh => uh.OrderNumber))
                 {
-                    await updateHandler.HandleUpdateAsync(update);
-                }
-                catch (Exception ex)
-                {
-                    await updateHandler.HandleErrorAsync(ex, update);
+                    try
+                    {
+                        await updateHandler.HandleUpdateAsync(update);
+                    }
+                    catch (Exception ex)
+                    {
+                        await updateHandler.HandleErrorAsync(ex, update);
+                    }
                 }
             }
-            
+
             _logger.LogTrace("Handled update {update}", update.ToLog());
         }
     }
