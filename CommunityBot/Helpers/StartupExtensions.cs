@@ -65,6 +65,10 @@ namespace CommunityBot.Helpers
             return services.AddSingleton(provider =>
             {
                 var options = provider.GetRequiredService<IOptions<SQLiteConfigurationOptions>>().Value;
+
+                var path = Path.GetDirectoryName(options.DbFilePath);
+
+                Directory.CreateDirectory(path);
                 
                 var connection = new SQLiteConnection($"DataSource=\"{options.DbFilePath}\";");
                 connection.Open();
