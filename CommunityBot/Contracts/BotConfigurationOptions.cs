@@ -19,5 +19,7 @@ namespace CommunityBot.Contracts
         public long[] DebugInfoChatIds { get; set; } = null!;
 
         public string[] Admins { get; set; } = null!;
+        
+        public string Version { get; set; } = null!;
     }
 }

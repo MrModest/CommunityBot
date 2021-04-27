@@ -11,11 +11,14 @@ namespace CommunityBot.Controllers
     public class LogsController : ControllerBase
     {
         private readonly LoggingConfigurationOptions _loggingOptions;
+        private readonly BotConfigurationOptions _botConfiguration;
 
         public LogsController(
-            IOptions<LoggingConfigurationOptions> loggingOptions)
+            IOptions<LoggingConfigurationOptions> loggingOptions,
+            IOptions<BotConfigurationOptions> botConfiguration)
         {
             _loggingOptions = loggingOptions.Value;
+            _botConfiguration = botConfiguration.Value;
         }
         
         [HttpGet("/logs/{date}")]
@@ -66,7 +69,7 @@ namespace CommunityBot.Controllers
         [HttpGet("/version")]
         public async Task<IActionResult> GetVersion()
         {
-            return Ok("2021-04-20");
+            return Ok(_botConfiguration.Version);
         }
     }
 }

@@ -20,6 +20,7 @@ namespace CommunityBot.Handlers
     {
         private readonly SQLiteConfigurationOptions _dbOptions;
         private const string BackupDbCommand = "backup_db";
+        private const string VersionDbCommand = "version";
         
         public BackupUpdateHandler(
             ITelegramBotClient botClient, 
@@ -35,10 +36,26 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return update.Message.ContainCommand(BackupDbCommand);
+            return update.Message.ContainCommand(BackupDbCommand, VersionDbCommand);
         }
 
         protected override async Task HandleUpdateInternalAsync(Update update)
+        {
+            var command = update.Message.GetFirstBotCommand()!.Value;
+
+            switch (command.name)
+            {
+                case BackupDbCommand:
+                    await Backup(update);
+                    return;
+                
+                case VersionDbCommand:
+                    await SendMessage(update.Message.Chat.Id, Options.Version, update.Message.MessageId);
+                    return;
+            }
+        }
+
+        private async Task Backup(Update update)
         {
             if (!IsFromAdmin(update))
             {
