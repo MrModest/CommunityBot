@@ -62,5 +62,11 @@ namespace CommunityBot.Controllers
 
             return Ok($"File in {_loggingOptions.FilePath} was NOT deleted!");
         }
+        
+        [HttpGet("/version")]
+        public async Task<IActionResult> GetVersion()
+        {
+            return Ok("2021-04-20");
+        }
     }
 }
