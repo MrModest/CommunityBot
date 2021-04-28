@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using CommunityBot.Contracts;
 using CommunityBot.Handlers;
+using CommunityBot.Handlers.BotCommands;
 using CommunityBot.Handlers.BotCommands.ChatManage;
 using CommunityBot.Persistence;
 using CommunityBot.Services;
@@ -51,8 +52,9 @@ namespace CommunityBot.Helpers
                 .AddSingleton<IUpdateHandler, GetAllChatsBotCommand>()
                 .AddSingleton<IUpdateHandler, GetIdOfThisChatBotCommand>()
                 
+                .AddSingleton<IUpdateHandler, BackupCommand>()
+                
                 .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
-                .AddSingleton<IUpdateHandler, BackupUpdateHandler>()
                 .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>()
                 .AddSingleton<IUpdateHandler, UserUpdateHandler>();
         }

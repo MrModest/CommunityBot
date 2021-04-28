@@ -35,6 +35,11 @@ namespace CommunityBot.Handlers.BotCommands
             {
                 return Result.Text(update.Message.Chat.Id, "Данная команда доступна только администраторам!", update.Message.MessageId);
             }
+
+            if (Config.AllowOnlyInPrivate && !update.Message.IsPrivate())
+            {
+                return Result.Text(update.Message.Chat.Id, "Команда доступна только в ЛС", update.Message.MessageId);
+            }
             
             var (_, commandArg) = update.Message.GetFirstBotCommand()!.Value;
             
