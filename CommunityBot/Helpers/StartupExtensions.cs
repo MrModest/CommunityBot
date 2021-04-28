@@ -5,6 +5,7 @@ using CommunityBot.Contracts;
 using CommunityBot.Handlers;
 using CommunityBot.Handlers.BotCommands;
 using CommunityBot.Handlers.BotCommands.ChatManage;
+using CommunityBot.Handlers.BotCommands.User;
 using CommunityBot.Persistence;
 using CommunityBot.Services;
 using Dapper;
@@ -53,6 +54,9 @@ namespace CommunityBot.Helpers
                 .AddSingleton<IUpdateHandler, GetIdOfThisChatBotCommand>()
                 
                 .AddSingleton<IUpdateHandler, BackupCommand>()
+                
+                .AddSingleton<IUpdateHandler, SetPasswordCommand>()
+                .AddSingleton<IUpdateHandler, CollectUserInfoCommand>()
                 
                 .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
                 .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>()
