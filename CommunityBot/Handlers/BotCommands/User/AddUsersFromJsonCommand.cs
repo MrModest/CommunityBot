@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
-using CommunityBot.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -13,56 +10,26 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace CommunityBot.Handlers
+namespace CommunityBot.Handlers.BotCommands.User
 {
-    public class UserUpdateHandler : UpdateHandlerBase
+    public class AddUsersFromJsonCommand : BotCommandHandlerBase
     {
         private readonly IAppUserRepository _appUserRepository;
-        private readonly InMemorySettingsService _inMemorySettingsService;
-        private const string AddUsersFromJsonCommand = "add_users_from_json";
 
-        public UserUpdateHandler(
-            ITelegramBotClient botClient,
-            IOptions<BotConfigurationOptions> options,
-            IAppUserRepository appUserRepository,
-            InMemorySettingsService inMemorySettingsService,
-            ILogger<UserUpdateHandler> logger)
+        public AddUsersFromJsonCommand(
+            ITelegramBotClient botClient, 
+            IOptions<BotConfigurationOptions> options, 
+            ILoggerFactory logger,
+            IAppUserRepository appUserRepository)
             : base(botClient, options, logger)
         {
             _appUserRepository = appUserRepository;
-            _inMemorySettingsService = inMemorySettingsService;
         }
 
-        protected override UpdateType[] AllowedUpdates => new[] {UpdateType.Message};
-        protected override bool CanHandle(Update update)
+        protected override BotCommandConfig Config { get; } =
+            new("add_users_from_json", isForAdmin: true, allowOnlyInPrivate: true);
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update, string commandArg)
         {
-            return update.Message.IsPrivate() &&
-                   update.Message.ContainCommand(AddUsersFromJsonCommand);
-        }
-
-        protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
-        {
-            var command = update.Message.GetFirstBotCommand()!.Value;
-
-            switch (command.name)
-            {
-                case AddUsersFromJsonCommand:
-                    return await AddUsersFromJson(update);
-                
-                default:
-                    return Result.Nothing();
-            }
-        }
-
-        private async Task<IUpdateHandlerResult> AddUsersFromJson(Update update)
-        {
-            if (!IsFromAdmin(update))
-            {
-                return Result.Text(update.Message.Chat.Id,
-                    "Данная команда доступна только администраторам!",
-                    update.Message.MessageId);
-            }
-            
             if (update.Message.Type != MessageType.Document)
             {
                 return Result.Text(update.Message.Chat.Id,

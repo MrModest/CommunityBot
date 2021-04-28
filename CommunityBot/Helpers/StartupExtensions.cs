@@ -46,21 +46,21 @@ namespace CommunityBot.Helpers
             return services
                 .AddSingleton<IUpdateHandler, RepostMessageUpdateHandler>()
                 .AddSingleton<IUpdateHandler, InfoMessageUpdateHandler>()
-                
+
                 .AddSingleton<IUpdateHandler, AddChatBotCommand>()
                 .AddSingleton<IUpdateHandler, AddThisChatBotCommand>()
                 .AddSingleton<IUpdateHandler, RemoveChatBotCommand>()
                 .AddSingleton<IUpdateHandler, GetAllChatsBotCommand>()
                 .AddSingleton<IUpdateHandler, GetIdOfThisChatBotCommand>()
-                
+
                 .AddSingleton<IUpdateHandler, BackupCommand>()
-                
+
                 .AddSingleton<IUpdateHandler, SetPasswordCommand>()
                 .AddSingleton<IUpdateHandler, CollectUserInfoCommand>()
-                
+                .AddSingleton<IUpdateHandler, AddUsersFromJsonCommand>()
+
                 .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
-                .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>()
-                .AddSingleton<IUpdateHandler, UserUpdateHandler>();
+                .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>();
         }
         
         public static IServiceCollection AddServices(this IServiceCollection services)
