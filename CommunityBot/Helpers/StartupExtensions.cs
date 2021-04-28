@@ -54,10 +54,12 @@ namespace CommunityBot.Helpers
                 .AddSingleton<IUpdateHandler, GetIdOfThisChatBotCommand>()
 
                 .AddSingleton<IUpdateHandler, BackupCommand>()
+                .AddSingleton<IUpdateHandler, GetVersionCommand>()
 
                 .AddSingleton<IUpdateHandler, SetPasswordCommand>()
                 .AddSingleton<IUpdateHandler, CollectUserInfoCommand>()
                 .AddSingleton<IUpdateHandler, AddUsersFromJsonCommand>()
+                .AddSingleton<IUpdateHandler, ShowAdminsCommand>()
 
                 .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
                 .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>();
@@ -78,6 +80,10 @@ namespace CommunityBot.Helpers
             return services.AddSingleton(provider =>
             {
                 var options = provider.GetRequiredService<IOptions<SQLiteConfigurationOptions>>().Value;
+
+                var path = Path.GetDirectoryName(options.DbFilePath);
+
+                Directory.CreateDirectory(path);
                 
                 var connection = new SQLiteConnection($"DataSource=\"{options.DbFilePath}\";");
                 connection.Open();

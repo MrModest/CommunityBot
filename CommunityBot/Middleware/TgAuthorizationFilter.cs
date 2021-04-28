@@ -46,7 +46,7 @@ namespace CommunityBot.Middleware
             }
 
             AppUser? user;
-            if (long.TryParse(idStr, out var id))
+            if (long.TryParse(idStr, out var id) && id > 0)
             {
                 user = await _appUserRepository.Get(id);
             }
