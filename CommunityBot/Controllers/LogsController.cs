@@ -40,7 +40,7 @@ namespace CommunityBot.Controllers
 
             var logs = await System.IO.File.ReadAllLinesAsync(logPath);
 
-            return Content(string.Join("________________________________________________\n", logs), "text/plain");
+            return Content(string.Join("\n________________________________________________\n", logs), "text/plain");
         }
         
         [HttpDelete("/logs")]
