@@ -142,7 +142,7 @@ namespace CommunityBot.Handlers
             var post = new StringBuilder();
             var postText = message.GetFirstBotCommand()?.arg ?? message.Text ?? message.Caption;
 
-            postText = postText.EncodeHtml();
+            postText = postText?.EncodeHtml() ?? string.Empty;
 
             if (message.GetEntities().Any())
             {
