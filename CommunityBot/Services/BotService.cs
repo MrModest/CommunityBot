@@ -93,7 +93,7 @@ namespace CommunityBot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error was thrown when trying sending handle result!");
+                    _logger.LogError(ex, "Error was thrown when trying sending result for handler '{HandlerName}'!", updateHandler.HandlerName);
                     await SendResult(Result.Error(_options.DebugInfoChatIds, updateHandler.HandlerName, ex));
                 }
             }
