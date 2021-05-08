@@ -18,11 +18,10 @@ namespace CommunityBot.Handlers
 
         public UserDataCollectorUpdateHandler(
             IAppUserRepository appUserRepository,
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options,
             InMemorySettingsService inMemorySettingsService,
             ILogger<UserDataCollectorUpdateHandler> logger)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
             _appUserRepository = appUserRepository;
             _inMemorySettingsService = inMemorySettingsService;

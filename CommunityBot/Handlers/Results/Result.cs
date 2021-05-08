@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -15,6 +17,21 @@ namespace CommunityBot.Handlers.Results
         public static TextUpdateHandlerResult Text(long chatId, string text, int replyToMessageId, ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false)
         {
             return new (chatId, text, replyToMessageId, parseMode, disableWebPagePreview);
+        }
+        
+        public static TextUpdateHandlerResult Error(long chatId, string handlerName, Exception exception)
+        {
+            return new (chatId, $"Exception was thrown in handler '{handlerName}':\n\n{exception.Message}\n\n{exception.StackTrace}", 0, ParseMode.Default, true);
+        }
+        
+        public static AggregateUpdateHandlerResult Error(IEnumerable<long> chatIds, string handlerName, Exception exception)
+        {
+            return Inners(
+                chatIds
+                    .Select(chatId => 
+                        Error(chatId, handlerName, exception)
+                    )
+            );
         }
 
         public static PhotoUpdateHandlerResult Photo(long chatId, string fileId, string caption, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)

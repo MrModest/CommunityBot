@@ -98,10 +98,6 @@ namespace CommunityBot.Helpers
         {    
             var configuration = hostBuilderContext.Configuration;
             var loggerConfiguration = new LoggerConfiguration();
-            
-            /*loggerConfiguration = loggerConfiguration
-                .WriteTo
-                .File(configuration.GetSection("Logging:FilePath").Value);*/
 
             var pathFormat = Path.Combine(configuration.GetSection("Logging:LogDir").Value, "log-{Date}.txt");
 

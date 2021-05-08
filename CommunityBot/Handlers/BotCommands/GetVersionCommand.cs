@@ -12,10 +12,9 @@ namespace CommunityBot.Handlers.BotCommands
     public class GetVersionCommand  : BotCommandHandlerBase
     {
         public GetVersionCommand(
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options, 
             ILoggerFactory logger)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
         }
 

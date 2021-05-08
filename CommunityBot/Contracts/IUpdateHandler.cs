@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CommunityBot.Handlers.Results;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -10,8 +11,8 @@ namespace CommunityBot.Contracts
     {
         int OrderNumber { get; }
         
-        Task HandleUpdateAsync(Update update);
+        string HandlerName { get; }
         
-        Task HandleErrorAsync(Exception exception, Update? update = null);
+        Task<IUpdateHandlerResult> HandleUpdateAsync(Update update);
     }
 }

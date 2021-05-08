@@ -16,6 +16,7 @@ using Telegram.Bot.Types.InputFiles;
 
 using CommunityBot.Contracts;
 using CommunityBot.Handlers;
+using CommunityBot.Handlers.Results;
 
 namespace CommunityBotTests.Handlers
 {
@@ -108,31 +109,19 @@ namespace CommunityBotTests.Handlers
             
             var expectedText = $"{repostFormatMessage ?? repostMessage}\n\n" +
                                $"{GetFooterText(update)}";
-                               
-            var botClientMoq = new Mock<ITelegramBotClient>();
 
-            (ChatId chatId, string text, ParseMode parseMode, bool disableWebPagePreview) sendTextMessageAsyncArgs = (0, "", ParseMode.Default, false);
-            
-            botClientMoq
-                .Setup(b => b.SendTextMessageAsync(It.IsAny<ChatId>(), It.IsAny<string>(), It.IsAny<ParseMode>(), It.IsAny<bool>(),
-                    It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<IReplyMarkup>(), It.IsAny<CancellationToken>()))
-                .Callback<ChatId, string, ParseMode, bool, bool, int, IReplyMarkup, CancellationToken>(
-                    (passedChatId, passedText, passedParseMode, passedWebPagePreviewFlag, _, _, _, _) =>
-                    {
-                        sendTextMessageAsyncArgs.chatId = passedChatId;
-                        sendTextMessageAsyncArgs.text = passedText;
-                        sendTextMessageAsyncArgs.parseMode = passedParseMode;
-                        sendTextMessageAsyncArgs.disableWebPagePreview = passedWebPagePreviewFlag;
-                    });
+            var handler = GetRepostHandler(update);
 
-            var handler = GetRepostHandler(update, botClient: botClientMoq.Object);
+            var resultTask = handler.HandleUpdateAsync(update);
 
-            handler.HandleUpdateAsync(update).Wait();
+            resultTask.Wait();
 
-            Assert.Equal(MainChannelId.ToString(), sendTextMessageAsyncArgs.chatId.ToString());
-            Assert.Equal(expectedText, sendTextMessageAsyncArgs.text);
-            Assert.Equal(ParseMode.Html, sendTextMessageAsyncArgs.parseMode);
-            Assert.True(sendTextMessageAsyncArgs.disableWebPagePreview);
+            var result = (TextUpdateHandlerResult)resultTask.Result;
+
+            Assert.Equal(MainChannelId.ToString(), result.ChatId);
+            Assert.Equal(expectedText, result.MessageText);
+            Assert.Equal(ParseMode.Html, result.ParseMode);
+            Assert.True(result.DisableWebPagePreview);
         }
         
         [Fact]
@@ -145,31 +134,19 @@ namespace CommunityBotTests.Handlers
             var expectedPhotoFileId = TestPhoto.OrderByDescending(ps => ps.FileSize).First().FileId;
             var expectedCaption = $"{repostMessage}\n\n" +
                                   $"{GetFooterText(update)}";
-            
-            var botClientMoq = new Mock<ITelegramBotClient>();
 
-            (ChatId chatId, InputOnlineFile photo, string caption, ParseMode parseMode) sendTextMessageAsyncArgs = (0, "", "", ParseMode.Default);
-            
-            botClientMoq
-                .Setup(b => b.SendPhotoAsync(It.IsAny<ChatId>(), It.IsAny<InputOnlineFile>(), It.IsAny<string>(), It.IsAny<ParseMode>(),
-                    It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<IReplyMarkup>(), It.IsAny<CancellationToken>()))
-                .Callback<ChatId, InputOnlineFile, string, ParseMode, bool, int, IReplyMarkup, CancellationToken>(
-                    (passedChatId, passedPhoto, passedCaption, passedParseMode, _, _, _, _) =>
-                    {
-                        sendTextMessageAsyncArgs.chatId = passedChatId;
-                        sendTextMessageAsyncArgs.photo = passedPhoto;
-                        sendTextMessageAsyncArgs.caption = passedCaption;
-                        sendTextMessageAsyncArgs.parseMode = passedParseMode;
-                    });
+            var handler = GetRepostHandler(update);
 
-            var handler = GetRepostHandler(update, botClient: botClientMoq.Object);
+            var resultTask = handler.HandleUpdateAsync(update);
 
-            handler.HandleUpdateAsync(update).Wait();
+            resultTask.Wait();
+
+            var result = (PhotoUpdateHandlerResult)resultTask.Result;
             
-            Assert.Equal(MainChannelId.ToString(), sendTextMessageAsyncArgs.chatId.ToString());
-            Assert.Equal(expectedPhotoFileId, sendTextMessageAsyncArgs.photo.FileId);
-            Assert.Equal(expectedCaption, sendTextMessageAsyncArgs.caption);
-            Assert.Equal(ParseMode.Html, sendTextMessageAsyncArgs.parseMode);
+            Assert.Equal(MainChannelId.ToString(), result.ChatId);
+            Assert.Equal(expectedPhotoFileId, result.FileId);
+            Assert.Equal(expectedCaption, result.Caption);
+            Assert.Equal(ParseMode.Html, result.ParseMode);
         }
 
         private static Update GetTextReplyUpdate(string repostMessage, MessageEntity[]? entities = null)
@@ -271,20 +248,17 @@ namespace CommunityBotTests.Handlers
         }
 
         private static RepostMessageUpdateHandler GetRepostHandler(Update update,
-            ITelegramBotClient? botClient = null,
             IOptions<BotConfigurationOptions>? options = null,
             ILogger<RepostMessageUpdateHandler>? logger = null,
             IChatRepository? chatRepository = null,
             IMediaGroupService? mediaGroupService = null)
         {
-            botClient ??= new Mock<ITelegramBotClient>().Object;
             options ??= GetBotConf();
             logger ??= new Mock<ILogger<RepostMessageUpdateHandler>>().Object;
             chatRepository ??= GetChatRep(update);
             mediaGroupService ??= new Mock<IMediaGroupService>().Object;
             
             return new RepostMessageUpdateHandler(
-                botClient,
                 options,
                 logger,
                 chatRepository,

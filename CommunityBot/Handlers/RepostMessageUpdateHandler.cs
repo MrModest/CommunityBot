@@ -23,12 +23,11 @@ namespace CommunityBot.Handlers
         private readonly IMediaGroupService _mediaGroupService;
 
         public RepostMessageUpdateHandler(
-            ITelegramBotClient botClient,
             IOptions<BotConfigurationOptions> options,
             ILogger<RepostMessageUpdateHandler> logger,
             IChatRepository chatRepository,
             IMediaGroupService mediaGroupService) 
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
             _chatRepository = chatRepository;
             _mediaGroupService = mediaGroupService;

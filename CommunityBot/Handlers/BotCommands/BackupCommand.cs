@@ -17,12 +17,11 @@ namespace CommunityBot.Handlers.BotCommands
     {
         private readonly SQLiteConfigurationOptions _dbOptions;
 
-        public BackupCommand(
-            ITelegramBotClient botClient, 
+        public BackupCommand( 
             IOptions<BotConfigurationOptions> options, 
             ILoggerFactory logger,
             IOptions<SQLiteConfigurationOptions> dbOptions)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
             _dbOptions = dbOptions.Value;
         }

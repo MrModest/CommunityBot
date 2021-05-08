@@ -15,10 +15,9 @@ namespace CommunityBot.Handlers
         private readonly IMediaGroupService _mediaGroupService;
 
         public MediaGroupUpdateHandler(
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options, 
             ILogger<MediaGroupUpdateHandler> logger,
-            IMediaGroupService mediaGroupService) : base(botClient, options, logger)
+            IMediaGroupService mediaGroupService) : base(options, logger)
         {
             _mediaGroupService = mediaGroupService;
         }

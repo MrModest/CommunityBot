@@ -15,11 +15,10 @@ namespace CommunityBot.Handlers.BotCommands.User
         private readonly IAppUserRepository _appUserRepository;
 
         public SetPasswordCommand(
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options, 
             ILoggerFactory logger,
             IAppUserRepository appUserRepository)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
             _appUserRepository = appUserRepository;
         }

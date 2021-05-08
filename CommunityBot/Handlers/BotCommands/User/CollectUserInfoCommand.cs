@@ -15,11 +15,10 @@ namespace CommunityBot.Handlers.BotCommands.User
         private readonly InMemorySettingsService _inMemorySettingsService;
 
         public CollectUserInfoCommand(
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options, 
             ILoggerFactory logger,
             InMemorySettingsService inMemorySettingsService)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
             _inMemorySettingsService = inMemorySettingsService;
         }

@@ -19,11 +19,10 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
                                             "Также важно, чтобы полное название чата было один в один с реальным названием, для этого его можно скопировать из информации о чате.";
 
         public AddChatBotCommand(
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options,
             IChatRepository chatRepository,
             ILoggerFactory logger)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
             _chatRepository = chatRepository;
         }

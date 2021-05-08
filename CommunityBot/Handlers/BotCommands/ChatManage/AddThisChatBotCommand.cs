@@ -12,6 +12,7 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
 {
     public class AddThisChatBotCommand : BotCommandHandlerBase
     {
+        private readonly ITelegramBotClient _botClient;
         private readonly IChatRepository _chatRepository;
 
         public AddThisChatBotCommand(
@@ -19,8 +20,9 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
             IOptions<BotConfigurationOptions> options,
             IChatRepository chatRepository,
             ILoggerFactory logger)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
+            _botClient = botClient;
             _chatRepository = chatRepository;
         }
 
@@ -55,7 +57,7 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
             {
                 try
                 {
-                    chat.InviteLink = await BotClient.ExportChatInviteLinkAsync(chat.Id);
+                    chat.InviteLink = await _botClient.ExportChatInviteLinkAsync(chat.Id);
                 }
                 catch (ApiRequestException e)
                 {

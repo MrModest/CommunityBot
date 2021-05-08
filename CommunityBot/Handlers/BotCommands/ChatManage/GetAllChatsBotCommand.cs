@@ -16,11 +16,10 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
         private readonly IChatRepository _chatRepository;
 
         public GetAllChatsBotCommand(
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options,
             IChatRepository chatRepository,
             ILoggerFactory logger)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
             _chatRepository = chatRepository;
         }

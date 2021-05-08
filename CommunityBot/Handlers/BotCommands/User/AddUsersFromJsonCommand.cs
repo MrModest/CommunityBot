@@ -14,6 +14,7 @@ namespace CommunityBot.Handlers.BotCommands.User
 {
     public class AddUsersFromJsonCommand : BotCommandHandlerBase
     {
+        private readonly ITelegramBotClient _botClient;
         private readonly IAppUserRepository _appUserRepository;
 
         public AddUsersFromJsonCommand(
@@ -21,8 +22,9 @@ namespace CommunityBot.Handlers.BotCommands.User
             IOptions<BotConfigurationOptions> options, 
             ILoggerFactory logger,
             IAppUserRepository appUserRepository)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
+            _botClient = botClient;
             _appUserRepository = appUserRepository;
         }
 
@@ -37,7 +39,7 @@ namespace CommunityBot.Handlers.BotCommands.User
                     update.Message.MessageId);
             }
 
-            var json = await BotClient.DownloadStringFile(update.Message.Document.FileId);
+            var json = await _botClient.DownloadStringFile(update.Message.Document.FileId);
 
             try
             {

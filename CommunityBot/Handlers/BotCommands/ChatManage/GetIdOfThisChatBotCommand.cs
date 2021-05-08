@@ -12,10 +12,9 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
     public class GetIdOfThisChatBotCommand : BotCommandHandlerBase
     {
         public GetIdOfThisChatBotCommand(
-            ITelegramBotClient botClient, 
             IOptions<BotConfigurationOptions> options, 
             ILoggerFactory logger)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
         }
 

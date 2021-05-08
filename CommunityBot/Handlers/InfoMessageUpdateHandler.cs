@@ -33,10 +33,9 @@ namespace CommunityBot.Handlers
         
         
         public InfoMessageUpdateHandler(
-            ITelegramBotClient botClient,
             IOptions<BotConfigurationOptions> options,
             ILogger<InfoMessageUpdateHandler> logger) 
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
         }
         

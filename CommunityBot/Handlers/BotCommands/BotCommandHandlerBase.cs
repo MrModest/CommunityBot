@@ -12,11 +12,10 @@ namespace CommunityBot.Handlers.BotCommands
 {
     public abstract class BotCommandHandlerBase : UpdateHandlerBase
     {
-        public BotCommandHandlerBase(
-            ITelegramBotClient botClient, 
+        public BotCommandHandlerBase( 
             IOptions<BotConfigurationOptions> options, 
             ILoggerFactory logger)
-            : base(botClient, options, logger)
+            : base(options, logger)
         {
         }
 

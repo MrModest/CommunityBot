@@ -14,28 +14,23 @@ namespace CommunityBot.Handlers
 {
     public abstract class UpdateHandlerBase : IUpdateHandler
     {
-        protected readonly ITelegramBotClient BotClient;
         protected readonly BotConfigurationOptions Options;
         protected readonly ILogger Logger;
 
-        private string HandlerName => GetType().Name;
+        public string HandlerName => GetType().Name;
 
         protected UpdateHandlerBase(
-            ITelegramBotClient botClient,
             IOptions<BotConfigurationOptions> options,
             ILogger logger)
         {
-            BotClient = botClient;
             Options = options.Value;
             Logger = logger;
         }
         
         protected UpdateHandlerBase(
-            ITelegramBotClient botClient,
             IOptions<BotConfigurationOptions> options,
             ILoggerFactory loggerFactory)
         {
-            BotClient = botClient;
             Options = options.Value;
             Logger = loggerFactory.CreateLogger(GetType());
         }
@@ -44,44 +39,44 @@ namespace CommunityBot.Handlers
 
         public virtual int OrderNumber => 0;
 
-        public async Task HandleUpdateAsync(Update update)
+        public async Task<IUpdateHandlerResult> HandleUpdateAsync(Update update)
         {
             if (!AllowedUpdates.Contains(update.Type) || !CanHandle(update))
             {
                 Logger.LogTrace("Can't handle with '{HandlerName}' | {Update}", HandlerName, update.ToLog());
-                return;
+                return Result.Nothing();
             }
             
             Logger.LogTrace("Start handler: '{HandlerName}' | {Update}", HandlerName, update.ToLog());
 
-            var result = await HandleUpdateInternal(update);
+            IUpdateHandlerResult result;
 
-            await HandleResult(result);
-            
+            try
+            {
+                result = await HandleUpdateInternal(update);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Caught exception in handler: '{HandlerName}' | [{Update}] | {ExMessage} | \n\n{ExStackTrace}", 
+                    HandlerName, update?.ToLog(), ex.Message, ex.StackTrace);
+                
+                result = await HandleErrorInternalAsync(ex, update);
+            }
+
             Logger.LogTrace("End handler: '{HandlerName}'", HandlerName);
-        }
 
-        public async Task HandleErrorAsync(Exception exception, Update? update = null)
-        {
-            Logger.LogError("Caught exception in handler: '{handlerName}' | [{update}] | {exMessage} | {exStackTrace}", 
-                HandlerName, update?.ToLog(), exception.Message, exception.StackTrace);
-
-            await HandleErrorInternalAsync(exception, update);
+            return result;
         }
 
         protected abstract bool CanHandle(Update update);
         
         protected abstract Task<IUpdateHandlerResult> HandleUpdateInternal(Update update);
 
-        protected virtual async Task HandleErrorInternalAsync(Exception exception, Update? update = null)
+        protected virtual Task<IUpdateHandlerResult> HandleErrorInternalAsync(Exception exception, Update? update = null)
         {
-            Logger.LogWarning("Default handler was called in '{handlerName}'! [{update}]", HandlerName, update?.ToLog());
+            Logger.LogWarning("Default handler was called in '{HandlerName}'! [{Update}]", HandlerName, update?.ToLog());
 
-            foreach (var debugInfoChatId in Options.DebugInfoChatIds)
-            {
-                await BotClient.SendTextMessageAsync(debugInfoChatId,
-                    $"Exception was throwed in handler '{HandlerName}':\n\n{exception.Message}\n\n{exception.StackTrace}");
-            }
+            return Result.Error(Options.DebugInfoChatIds, HandlerName, exception).AsTask();
         }
 
         protected bool IsFromAdmin(Update update)
@@ -99,51 +94,6 @@ namespace CommunityBot.Handlers
             };
 
             return Options.Admins.Contains(fromUser?.Username);
-        }
-
-        private async Task HandleResult(IUpdateHandlerResult result)
-        {
-            switch (result)
-            {
-                case TextUpdateHandlerResult textResult:
-                    await BotClient.SendTextMessageAsync(textResult.ChatId, textResult.MessageText, 
-                        textResult.ParseMode, textResult.DisableWebPagePreview, replyToMessageId: textResult.ReplyToMessageId);
-                    break;
-                
-                case PhotoUpdateHandlerResult photoResult:
-                    await BotClient.SendPhotoAsync(photoResult.ChatId, photoResult.FileId, photoResult.Caption,
-                        photoResult.ParseMode, replyToMessageId: photoResult.ReplyToMessageId);
-                    break;
-                
-                case VideoUpdateHandlerResult videoResult:
-                    await BotClient.SendVideoAsync(videoResult.ChatId, videoResult.FileId, caption: videoResult.Caption,
-                        parseMode: videoResult.ParseMode, replyToMessageId: videoResult.ReplyToMessageId);
-                    break;
-                
-                case MediaGroupUpdateHandlerResult mediaGroupResult:
-                    await BotClient.SendMediaGroupAsync(mediaGroupResult.MediaList, mediaGroupResult.ChatId, 
-                        replyToMessageId: mediaGroupResult.ReplyToMessageId);
-                    break;
-                
-                case DocumentUpdateHandlerResult documentResult:
-                    await BotClient.SendDocumentAsync(documentResult.ChatId, documentResult.File, documentResult.Caption, 
-                        documentResult.ParseMode, replyToMessageId: documentResult.ReplyToMessageId);
-                    documentResult.Dispose();
-                    break;
-                
-                case AggregateUpdateHandlerResult aggregateResult:
-                    Logger.LogTrace("Start handle aggregate result ({Count})", aggregateResult.InnerResults.Length);
-                    foreach (var innerResult in aggregateResult.InnerResults)
-                    {
-                        await HandleResult(innerResult);
-                    }
-                    Logger.LogTrace("End handle aggregate result");
-                    break;
-                
-                case NothingUpdateHandlerResult:
-                    Logger.LogTrace("Doing nothing for handler '{HandlerName}'", HandlerName);
-                    break;
-            }
         }
     }
 }
