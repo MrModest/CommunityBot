@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 using CommunityBot.Contracts;
+using CommunityBot.Handlers.Results;
 using CommunityBot.Helpers;
 using Microsoft.Extensions.Logging;
 using Chat = Telegram.Bot.Types.Chat;
@@ -43,7 +44,7 @@ namespace CommunityBot.Handlers
                    update.Message.HasMentionOfUserName(Options.BotName);
         }
 
-        protected override async Task HandleUpdateInternalAsync(Update update)
+        protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
         {
             Message? message = null;
             
@@ -59,43 +60,44 @@ namespace CommunityBot.Handlers
 
             if (message != null)
             {
-                await SendPost(message);
-                return;
+                return await SendPost(message);
             }
             
             Logger.LogInformation("Update {Update} was skipped!", update.ToLog());
+
+            return Result.Nothing();
         }
 
-        private async Task SendPost(Message message)
+        private async Task<IUpdateHandlerResult> SendPost(Message message)
         {
             switch (message.Type)
             {
                 case MessageType.Text:
-                    await SendTextPost(message);
-                    break;
+                    return await SendTextPost(message);
                 case MessageType.Photo:
                 case MessageType.Video:
                     if (message.MediaGroupId.IsBlank())
                     {
-                        await SendPhotoVideoPost(message);    
+                        return await SendPhotoVideoPost(message);    
                     }
                     else
                     {
-                        await SendMediaGroupPost(message);
+                        return await SendMediaGroupPost(message);
                     }
-                    break;
+                
+                default:
+                    return Result.Nothing();
             }
         }
 
-        private async Task SendTextPost(Message message)
+        private async Task<IUpdateHandlerResult> SendTextPost(Message message)
         {
             var text = await PreparePost(message);
             
-            await BotClient.SendTextMessageAsync(Options.MainChannelId, text, ParseMode.Html,
-                disableWebPagePreview: true);
+            return Result.Text(Options.MainChannelId, text, ParseMode.Html, true);
         }
 
-        private async Task SendPhotoVideoPost(Message message)
+        private async Task<IUpdateHandlerResult> SendPhotoVideoPost(Message message)
         {
             var caption = await PreparePost(message);
 
@@ -105,35 +107,34 @@ namespace CommunityBot.Handlers
                 {
                     var photo = message.Photo.GetLargestPhotoSize().FileId;
                 
-                    await BotClient.SendPhotoAsync(Options.MainChannelId, photo, caption, ParseMode.Html);
-                    break;
+                    return Result.Photo(Options.MainChannelId, photo, caption, ParseMode.Html);
                 }
                 case MessageType.Video:
-                    await BotClient.SendVideoAsync(Options.MainChannelId, message.Video.FileId, caption: caption, parseMode: ParseMode.Html);
-                    break;
+                    return Result.Video(Options.MainChannelId, message.Video.FileId, caption, ParseMode.Html);
                 
                 default:
                     throw new InvalidOperationException($"Not supported MessageType: {message.Type}");
             }
         }
 
-        private async Task SendMediaGroupPost(Message message)
+        private async Task<IUpdateHandlerResult> SendMediaGroupPost(Message message)
         {
             var media = _mediaGroupService.GetMediaByGroupId(message.MediaGroupId)?.ToArray();
 
             if (media == null)
             {
-                Logger.LogWarning("Post was not send because not found media group with id '{id}'", message.MediaGroupId);
-                return;
+                Logger.LogWarning("Post was not send because not found media group with id '{Id}'", message.MediaGroupId);
+                return Result.Nothing();
             }
 
             foreach (var inputMedia in media.Where(m => m.Caption != null).OfType<InputMediaBase>())
             {
                 message.Caption = inputMedia.Caption;
                 inputMedia.Caption = await PreparePost(message);
+                inputMedia.ParseMode = ParseMode.Html;
             }
             
-            await BotClient.SendMediaGroupAsync(media, Options.MainChannelId);
+            return Result.MediaGroup(Options.MainChannelId, media);
         }
 
         private async Task<string> PreparePost(Message message)

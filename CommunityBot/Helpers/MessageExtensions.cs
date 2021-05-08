@@ -60,14 +60,14 @@ namespace CommunityBot.Helpers
             var text = message.GetTextOrCaption();
 
             return (
-                name: text.Substring(entity.Offset + 1, entity.Length - 1),
+                name: text.Substring(entity.Offset + 1, entity.Length - 1).ToLower(),
                 arg: text.Remove(entity.Offset, entity.Length).Trim()
             );
         }
 
         public static bool ContainCommand(this Message message, params string[] commands)
         {
-            return message.GetFirstBotCommand()?.name.In(commands) == true;
+            return message.GetFirstBotCommand()?.name.InWithIgnoreCase(commands) == true;
         }
 
         private static string[] GetMentionedUserNames(this Message message)
@@ -81,7 +81,7 @@ namespace CommunityBot.Helpers
         public static bool HasMentionOfUserName(this Message message, string username)
         {
             return message.GetMentionedUserNames()
-                .Any(m => m.Equals(username, StringComparison.OrdinalIgnoreCase));
+                .Any(m => m.Equals(username, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public static IAlbumInputMedia? ToInputMedia(this Message message)

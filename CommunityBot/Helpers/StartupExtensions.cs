@@ -3,6 +3,9 @@ using System.IO;
 using System.Linq;
 using CommunityBot.Contracts;
 using CommunityBot.Handlers;
+using CommunityBot.Handlers.BotCommands;
+using CommunityBot.Handlers.BotCommands.ChatManage;
+using CommunityBot.Handlers.BotCommands.User;
 using CommunityBot.Persistence;
 using CommunityBot.Services;
 using Dapper;
@@ -43,11 +46,23 @@ namespace CommunityBot.Helpers
             return services
                 .AddSingleton<IUpdateHandler, RepostMessageUpdateHandler>()
                 .AddSingleton<IUpdateHandler, InfoMessageUpdateHandler>()
-                .AddSingleton<IUpdateHandler, ChatManageUpdateHandler>()
+
+                .AddSingleton<IUpdateHandler, AddChatBotCommand>()
+                .AddSingleton<IUpdateHandler, AddThisChatBotCommand>()
+                .AddSingleton<IUpdateHandler, RemoveChatBotCommand>()
+                .AddSingleton<IUpdateHandler, GetAllChatsBotCommand>()
+                .AddSingleton<IUpdateHandler, GetIdOfThisChatBotCommand>()
+
+                .AddSingleton<IUpdateHandler, BackupCommand>()
+                .AddSingleton<IUpdateHandler, GetVersionCommand>()
+
+                .AddSingleton<IUpdateHandler, SetPasswordCommand>()
+                .AddSingleton<IUpdateHandler, CollectUserInfoCommand>()
+                .AddSingleton<IUpdateHandler, AddUsersFromJsonCommand>()
+                .AddSingleton<IUpdateHandler, ShowAdminsCommand>()
+
                 .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
-                .AddSingleton<IUpdateHandler, BackupUpdateHandler>()
-                .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>()
-                .AddSingleton<IUpdateHandler, UserUpdateHandler>();
+                .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>();
         }
         
         public static IServiceCollection AddServices(this IServiceCollection services)
