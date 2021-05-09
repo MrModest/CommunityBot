@@ -33,7 +33,7 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return _inMemorySettingsService.GetSettingCollectUserInfo() && update.Message.From != null;
+            return _inMemorySettingsService.GetSettingValue(InMemorySettingKey.CollectUserInfo, false) && update.Message.From != null;
         }
 
         protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CommunityBot.Services
@@ -7,8 +8,6 @@ namespace CommunityBot.Services
     {
         private const string Prefix = "InMemorySettings_";
 
-        private const string CollectUserInfoSettingKey = "CollectUserInfo";
-        
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<InMemorySettingsService> _logger;
 
@@ -20,22 +19,41 @@ namespace CommunityBot.Services
             _logger = logger;
         }
 
-        public void SetSettingCollectUserInfo(bool value)
+        public TValue SetSettingValue<TValue>(InMemorySettingKey settingKey, TValue value)
+            where TValue: notnull
         {
-            _memoryCache.Set(Prefix + CollectUserInfoSettingKey, value);
-            _logger.LogWarning("InMemorySetting {setting} was changed to {value}", CollectUserInfoSettingKey, value);
+            CheckNotNull(value);
+            _memoryCache.Set($"{Prefix}{settingKey}", value);
+            _logger.LogWarning("InMemorySetting {Setting} was changed to {Value}", settingKey, value);
+            
+            return value;
         }
 
-        public bool GetSettingCollectUserInfo()
+        public TValue GetSettingValue<TValue>(InMemorySettingKey settingKey, TValue defaultValue)
+            where TValue: notnull
         {
-            if (_memoryCache.TryGetValue(Prefix + CollectUserInfoSettingKey, out bool value))
+            CheckNotNull(defaultValue);
+            if (_memoryCache.TryGetValue($"{Prefix}{settingKey}", out TValue value))
             {
                 return value;
             }
-            
-            SetSettingCollectUserInfo(false);
 
-            return false;
+            SetSettingValue(settingKey, defaultValue);
+
+            return defaultValue;
         }
+
+        private static void CheckNotNull<TValue>(TValue value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+        }
+    }
+
+    public enum InMemorySettingKey
+    {
+        CollectUserInfo
     }
 }

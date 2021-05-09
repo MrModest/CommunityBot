@@ -33,7 +33,7 @@ namespace CommunityBot.Handlers.BotCommands.User
                     update.Message.MessageId).AsTask();
             }
 
-            _inMemorySettingsService.SetSettingCollectUserInfo(value == "on");
+            _inMemorySettingsService.SetSettingValue(InMemorySettingKey.CollectUserInfo, value == "on");
             
             return Result.Text(update.Message.Chat.Id,
                 "Значение обновлено!",
