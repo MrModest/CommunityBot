@@ -1,22 +1,19 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using CommunityBot.Contracts;
-using Microsoft.Extensions.Caching.Memory;
 using Telegram.Bot.Types;
 
 namespace CommunityBot.Services
 {
     public class MediaGroupService : IMediaGroupService
     {
-        private readonly IMemoryCache _memoryCache;
+        private readonly IMemoryCacheWrapper _memoryCache;
         
         public MediaGroupService(
-            IMemoryCache memoryCache)
+            IMemoryCacheWrapperFactory memoryCacheWrapperFactory)
         {
-            _memoryCache = memoryCache;
+            _memoryCache = memoryCacheWrapperFactory.CreateWrapper("MediaGroupId");
         }
 
         public void AddMediaToGroup(string mediaGroupId, IAlbumInputMedia media)

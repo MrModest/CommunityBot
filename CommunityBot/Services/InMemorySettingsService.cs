@@ -1,21 +1,19 @@
 ﻿using System;
-using Microsoft.Extensions.Caching.Memory;
+using CommunityBot.Contracts;
 using Microsoft.Extensions.Logging;
 
 namespace CommunityBot.Services
 {
     public class InMemorySettingsService
     {
-        private const string Prefix = "InMemorySettings_";
-
-        private readonly IMemoryCache _memoryCache;
+        private readonly IMemoryCacheWrapper _memoryCache;
         private readonly ILogger<InMemorySettingsService> _logger;
 
         public InMemorySettingsService(
-            IMemoryCache memoryCache,
+            IMemoryCacheWrapperFactory memoryCacheWrapperFactory,
             ILogger<InMemorySettingsService> logger)
         {
-            _memoryCache = memoryCache;
+            _memoryCache = memoryCacheWrapperFactory.CreateWrapper("InMemorySettings_");
             _logger = logger;
         }
 
@@ -23,7 +21,7 @@ namespace CommunityBot.Services
             where TValue: notnull
         {
             CheckNotNull(value);
-            _memoryCache.Set($"{Prefix}{settingKey}", value);
+            _memoryCache.Set(settingKey.ToString(), value);
             _logger.LogWarning("InMemorySetting {Setting} was changed to {Value}", settingKey, value);
             
             return value;
@@ -33,7 +31,7 @@ namespace CommunityBot.Services
             where TValue: notnull
         {
             CheckNotNull(defaultValue);
-            if (_memoryCache.TryGetValue($"{Prefix}{settingKey}", out TValue value))
+            if (_memoryCache.TryGetValue(settingKey.ToString(), out TValue value))
             {
                 return value;
             }

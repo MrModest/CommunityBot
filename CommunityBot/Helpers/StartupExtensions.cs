@@ -72,6 +72,7 @@ namespace CommunityBot.Helpers
                 .AddSingleton<IChatRepository, SqliteChatRepository>()
                 .AddSingleton<IAppUserRepository, AppUserRepository>()
                 .AddSingleton<IMediaGroupService, MediaGroupService>()
+                .AddSingleton<IMemoryCacheWrapperFactory, MemoryCacheWrapperFactory>()
                 .AddSingleton<InMemorySettingsService>();
         }
         
