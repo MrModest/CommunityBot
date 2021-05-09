@@ -36,6 +36,7 @@ namespace CommunityBot.Handlers
             if (media != null)
             {
                 _mediaGroupService.AddMediaToGroup(update.Message.MediaGroupId, media);
+                return Result.Nothing().AsTask();
             }
             
             Logger.LogInformation("Skipped media for groupId {mediaGroupId} | update: {update}", update.Message.MediaGroupId, update.ToLog());
