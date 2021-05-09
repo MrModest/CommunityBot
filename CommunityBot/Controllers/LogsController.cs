@@ -21,7 +21,7 @@ namespace CommunityBot.Controllers
             _botConfiguration = botConfiguration.Value;
         }
         
-        [HttpGet("/logs/{date}")]
+        [HttpGet("/logs/{date?}")]
         public async Task<IActionResult> GetLogs(string? date = null)
         {
             if (_loggingOptions.LogDir.IsBlank())
