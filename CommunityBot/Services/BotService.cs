@@ -107,17 +107,17 @@ namespace CommunityBot.Services
             {
                 case TextUpdateHandlerResult textResult:
                     await _botClient.SendTextMessageAsync(textResult.ChatId, textResult.MessageText, 
-                        textResult.ParseMode, textResult.DisableWebPagePreview, replyToMessageId: textResult.ReplyToMessageId);
+                        textResult.ParseMode, textResult.DisableWebPagePreview, replyToMessageId: textResult.ReplyToMessageId, replyMarkup: textResult.ReplyMarkup);
                     break;
                 
                 case PhotoUpdateHandlerResult photoResult:
                     await _botClient.SendPhotoAsync(photoResult.ChatId, photoResult.FileId, photoResult.Caption,
-                        photoResult.ParseMode, replyToMessageId: photoResult.ReplyToMessageId);
+                        photoResult.ParseMode, replyToMessageId: photoResult.ReplyToMessageId, replyMarkup: photoResult.ReplyMarkup);
                     break;
                 
                 case VideoUpdateHandlerResult videoResult:
                     await _botClient.SendVideoAsync(videoResult.ChatId, videoResult.FileId, caption: videoResult.Caption,
-                        parseMode: videoResult.ParseMode, replyToMessageId: videoResult.ReplyToMessageId);
+                        parseMode: videoResult.ParseMode, replyToMessageId: videoResult.ReplyToMessageId, replyMarkup: videoResult.ReplyMarkup);
                     break;
                 
                 case MediaGroupUpdateHandlerResult mediaGroupResult:
@@ -127,7 +127,7 @@ namespace CommunityBot.Services
                 
                 case DocumentUpdateHandlerResult documentResult:
                     await _botClient.SendDocumentAsync(documentResult.ChatId, documentResult.File, documentResult.Caption, 
-                        documentResult.ParseMode, replyToMessageId: documentResult.ReplyToMessageId);
+                        documentResult.ParseMode, replyToMessageId: documentResult.ReplyToMessageId, replyMarkup: documentResult.ReplyMarkup);
                     documentResult.Dispose();
                     break;
                 

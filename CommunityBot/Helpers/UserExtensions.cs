@@ -1,3 +1,4 @@
+using System;
 using CommunityBot.Contracts;
 using Telegram.Bot.Types;
 
@@ -18,6 +19,7 @@ namespace CommunityBot.Helpers
                 Username = user.Username,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                Joined = DateTime.Now,
                 AccessType = UserAccessType.Unknown
             };
         }

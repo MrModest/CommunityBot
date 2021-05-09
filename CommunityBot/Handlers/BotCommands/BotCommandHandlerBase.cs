@@ -32,19 +32,19 @@ namespace CommunityBot.Handlers.BotCommands
         {
             if (Config.IsForAdmin && !IsFromAdmin(update))
             {
-                return Result.Text(update.Message.Chat.Id, "Данная команда доступна только администраторам!", update.Message.MessageId);
+                return ReplyPlainText(update, "Данная команда доступна только администраторам!");
             }
 
             if (Config.AllowOnlyInPrivate && !update.Message.IsPrivate())
             {
-                return Result.Text(update.Message.Chat.Id, "Команда доступна только в ЛС", update.Message.MessageId);
+                return ReplyPlainText(update, "Команда доступна только в ЛС");
             }
             
             var (_, commandArg) = update.Message.GetFirstBotCommand()!.Value;
             
             if (Config.ArgRequiredMessage.IsNotBlank() && commandArg.IsBlank())
             {
-                return Result.Text(update.Message.Chat.Id, Config.ArgRequiredMessage!, update.Message.MessageId);
+                return ReplyPlainText(update, Config.ArgRequiredMessage!);
             }
 
             return await HandleUpdateInternal(update, commandArg);

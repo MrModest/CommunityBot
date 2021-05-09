@@ -1,7 +1,5 @@
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 
@@ -9,29 +7,19 @@ namespace CommunityBot.Persistence
 {
     public class AppUserRepository : RepositoryBase<AppUser>, IAppUserRepository
     {
-        private ConcurrentBag<long>? _existedUserIds;
+        private readonly IMemoryCacheWrapper _memoryCacheWrapper;
 
         public AppUserRepository(
-            SQLiteConnection connection)
+            SQLiteConnection connection,
+            IMemoryCacheWrapperFactory memoryCacheWrapperFactory)
             : base(connection)
         {
+            _memoryCacheWrapper = memoryCacheWrapperFactory.CreateWrapper("User_");
         }
 
         public async Task<bool> IsExisted(long id)
         {
-            if (_existedUserIds == null)
-            {
-                var userIds = (await GetAllInternal()).Select(u => u.Id).ToList();
-
-                _existedUserIds ??= new ConcurrentBag<long>(userIds);
-            }
-
-            if (_existedUserIds.Contains(id))
-            {
-                return true;
-            }
-
-            var user = await Get(id);
+            var user = await GetCached(id);
 
             return user != null;
         }
@@ -52,15 +40,30 @@ namespace CommunityBot.Persistence
         }
 
         public Task Add(AppUser appUser)
-        { 
-            _existedUserIds?.Add(appUser.Id);
-            
+        {
             return Insert(appUser);
         }
 
         public new Task Update(AppUser appUser)
         {
             return base.Update(appUser);
+        }
+
+        private async Task<AppUser?> GetCached(long id)
+        {
+            if (_memoryCacheWrapper.TryGetValue(id.ToString(), out AppUser cachedUser))
+            {
+                return cachedUser;
+            }
+            
+            var user = await Get(id);
+
+            if (user != null)
+            {
+                return _memoryCacheWrapper.Set(id.ToString(), user);
+            }
+
+            return null;
         }
     }
 }

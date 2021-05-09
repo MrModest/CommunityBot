@@ -4,19 +4,20 @@ using System.IO;
 using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CommunityBot.Handlers.Results
 {
     public static class Result
     {
-        public static TextUpdateHandlerResult Text(long chatId, string text, ParseMode parseMode, bool disableWebPagePreview)
+        public static TextUpdateHandlerResult Text(long chatId, string text, ParseMode parseMode, bool disableWebPagePreview, IReplyMarkup? replyMarkup = null)
         {
-            return new (chatId, text, 0, parseMode, disableWebPagePreview);
+            return new (chatId, text, 0, parseMode, disableWebPagePreview, replyMarkup);
         }
         
-        public static TextUpdateHandlerResult Text(long chatId, string text, int replyToMessageId, ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false)
+        public static TextUpdateHandlerResult Text(long chatId, string text, int replyToMessageId, ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false, IReplyMarkup? replyMarkup = null)
         {
-            return new (chatId, text, replyToMessageId, parseMode, disableWebPagePreview);
+            return new (chatId, text, replyToMessageId, parseMode, disableWebPagePreview, replyMarkup);
         }
         
         public static TextUpdateHandlerResult Error(long chatId, string handlerName, Exception exception)

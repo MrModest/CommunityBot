@@ -95,5 +95,10 @@ namespace CommunityBot.Handlers
 
             return Options.Admins.Contains(fromUser?.Username);
         }
+        
+        protected static IUpdateHandlerResult ReplyPlainText(Update update, string text)
+        {
+            return Result.Text(update.Message.Chat.Id, text, update.Message.MessageId);
+        }
     }
 }

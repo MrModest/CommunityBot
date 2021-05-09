@@ -1,11 +1,12 @@
 ﻿using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CommunityBot.Handlers.Results
 {
     public abstract class MediaUpdateHandlerResult : UpdateHandlerResultBase
     {
-        public MediaUpdateHandlerResult(long chatId, string fileId, string caption, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0)
-            : base(chatId, caption, parseMode, replyToMessageId)
+        public MediaUpdateHandlerResult(long chatId, string fileId, string caption, ParseMode parseMode = ParseMode.Default, int replyToMessageId = 0, IReplyMarkup? replyMarkup = null)
+            : base(chatId, caption, parseMode, replyToMessageId, replyMarkup)
         {
             FileId = fileId;
         }

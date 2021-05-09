@@ -10,6 +10,7 @@ namespace CommunityBot.Contracts
             ChatId = chatId;
             ExactName = exactName;
             JoinLink = joinLink;
+            WelcomeMessage = "{ \"IsOn\": false, \"Message\": \"\", \"ButtonName\": \"\", \"ButtonLink\": \"\" }";
         }
 
         //For Dapper
@@ -23,8 +24,12 @@ namespace CommunityBot.Contracts
         [Key]
         public long Id { get; set; }
 
-        public long ChatId { get; }
-        public string ExactName { get; }
-        public string JoinLink { get; }
+        public long ChatId { get; set; }
+        public string ExactName { get; set; }
+        public string JoinLink { get; set; }
+        
+        public string WelcomeMessage { get; set; }
     }
+
+    public record WelcomeMessage (bool IsOn, string Message, string ButtonName, string ButtonLink);
 }

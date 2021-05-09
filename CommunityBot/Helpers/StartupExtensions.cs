@@ -52,17 +52,20 @@ namespace CommunityBot.Helpers
                 .AddSingleton<IUpdateHandler, RemoveChatBotCommand>()
                 .AddSingleton<IUpdateHandler, GetAllChatsBotCommand>()
                 .AddSingleton<IUpdateHandler, GetIdOfThisChatBotCommand>()
+                .AddSingleton<IUpdateHandler, SetWelcomeMessageCommand>()
 
                 .AddSingleton<IUpdateHandler, BackupCommand>()
                 .AddSingleton<IUpdateHandler, GetVersionCommand>()
 
                 .AddSingleton<IUpdateHandler, SetPasswordCommand>()
-                .AddSingleton<IUpdateHandler, CollectUserInfoCommand>()
+                .AddSingleton<IUpdateHandler, InMemorySettingsToggleCommand>()
                 .AddSingleton<IUpdateHandler, AddUsersFromJsonCommand>()
                 .AddSingleton<IUpdateHandler, ShowAdminsCommand>()
+                .AddSingleton<IUpdateHandler, MigrationCommand>()
 
                 .AddSingleton<IUpdateHandler, MediaGroupUpdateHandler>()
-                .AddSingleton<IUpdateHandler, UserDataCollectorUpdateHandler>();
+                .AddSingleton<IUpdateHandler, NewUsersCheckUpdateHandler>()
+                .AddSingleton<IUpdateHandler, WelcomeMessageUpdateHandler>();
         }
         
         public static IServiceCollection AddServices(this IServiceCollection services)
@@ -71,6 +74,7 @@ namespace CommunityBot.Helpers
                 .AddSingleton<BotService>()
                 .AddSingleton<IChatRepository, SqliteChatRepository>()
                 .AddSingleton<IAppUserRepository, AppUserRepository>()
+                .AddSingleton<MigrationRepository>()
                 .AddSingleton<IMediaGroupService, MediaGroupService>()
                 .AddSingleton<IMemoryCacheWrapperFactory, MemoryCacheWrapperFactory>()
                 .AddSingleton<InMemorySettingsService>();
@@ -130,24 +134,25 @@ namespace CommunityBot.Helpers
                 if (tableName == "SavedChats")
                 {
                     connection.Execute(@"CREATE TABLE IF NOT EXISTS main.SavedChats (
-                                            Id        INT  NOT NULL PRIMARY KEY, 
-                                            ChatId    INT  NOT NULL, 
-                                            ExactName TEXT NOT NULL, 
-                                            JoinLink  TEXT NOT NULL);");
+                                            Id        INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, 
+                                            ChatId    INTEGER  NOT NULL, 
+                                            ExactName TEXT     NOT NULL, 
+                                            JoinLink  TEXT     NOT NULL);");
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.ExactName_desc ON SavedChats (ExactName DESC);");
                 }
 
                 if (tableName == "Users")
                 {
                     connection.Execute(@"CREATE TABLE IF NOT EXISTS main.Users (
-                                            Id            INT  NOT NULL PRIMARY KEY, 
-                                            Username      TEXT DEFAULT NULL, 
-                                            FirstName     TEXT DEFAULT NULL, 
-                                            LastName      TEXT DEFAULT NULL, 
-                                            InvitedBy     INT  DEFAULT NULL, 
-                                            InviteComment TEXT DEFAULT NULL, 
-                                            AccessType    TEXT NOT NULL,
-                                            PasswordHash  TEXT DEFAULT NULL);");
+                                            Id            INTEGER NOT NULL PRIMARY KEY, 
+                                            Username      TEXT    DEFAULT NULL, 
+                                            FirstName     TEXT    DEFAULT NULL, 
+                                            LastName      TEXT    DEFAULT NULL, 
+                                            Joined        TEXT    DEFAULT '2000-01-01 00:00:00',
+                                            InvitedBy     INT     DEFAULT NULL, 
+                                            InviteComment TEXT    DEFAULT NULL, 
+                                            AccessType    INTEGER NOT NULL,
+                                            PasswordHash  TEXT    DEFAULT NULL);");
                     
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.Username_desc   ON Users (Username DESC);");
                     connection.Execute("CREATE INDEX IF NOT EXISTS main.AccessType_desc ON Users (AccessType DESC);");

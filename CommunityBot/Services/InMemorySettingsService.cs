@@ -52,6 +52,7 @@ namespace CommunityBot.Services
 
     public enum InMemorySettingKey
     {
-        CollectUserInfo
+        NewUsersCheck,
+        WelcomeMessageSending
     }
 }

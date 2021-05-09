@@ -1,3 +1,4 @@
+using System;
 using Dapper.Contrib.Extensions;
 
 namespace CommunityBot.Contracts
@@ -13,6 +14,8 @@ namespace CommunityBot.Contracts
         public string? FirstName { get; set; }
         
         public string? LastName { get; set; }
+        
+        public DateTime Joined { get; set; } 
 
         public long? InvitedBy { get; set; }
         

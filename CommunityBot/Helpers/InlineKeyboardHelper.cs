@@ -1,3 +1,4 @@
+using CommunityBot.Contracts;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CommunityBot.Helpers
@@ -11,6 +12,19 @@ namespace CommunityBot.Helpers
                 InlineKeyboardButton.WithCallbackData("❌ Спам!", "report"), 
                 InlineKeyboardButton.WithCallbackData("🧡", "like")
             });
+        }
+
+        public static IReplyMarkup? GetWelcomeButton(WelcomeMessage welcomeMessage)
+        {
+            if (welcomeMessage.ButtonLink.IsBlank() || welcomeMessage.ButtonName.IsBlank())
+            {
+                return null;
+            }
+            
+            return new InlineKeyboardMarkup(
+                InlineKeyboardButton.WithUrl(
+                    welcomeMessage.ButtonName,
+                    welcomeMessage.ButtonLink));
         }
     }
 }

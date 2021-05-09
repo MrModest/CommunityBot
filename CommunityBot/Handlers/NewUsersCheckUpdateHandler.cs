@@ -11,16 +11,16 @@ using Telegram.Bot.Types.Enums;
 
 namespace CommunityBot.Handlers
 {
-    public class UserDataCollectorUpdateHandler : UpdateHandlerBase
+    public class NewUsersCheckUpdateHandler : UpdateHandlerBase
     {
         private readonly IAppUserRepository _appUserRepository;
         private readonly InMemorySettingsService _inMemorySettingsService;
 
-        public UserDataCollectorUpdateHandler(
+        public NewUsersCheckUpdateHandler(
             IAppUserRepository appUserRepository,
             IOptions<BotConfigurationOptions> options,
             InMemorySettingsService inMemorySettingsService,
-            ILogger<UserDataCollectorUpdateHandler> logger)
+            ILogger<NewUsersCheckUpdateHandler> logger)
             : base(options, logger)
         {
             _appUserRepository = appUserRepository;
@@ -33,7 +33,7 @@ namespace CommunityBot.Handlers
 
         protected override bool CanHandle(Update update)
         {
-            return _inMemorySettingsService.GetSettingValue(InMemorySettingKey.CollectUserInfo, false) && update.Message.From != null;
+            return _inMemorySettingsService.GetSettingValue(InMemorySettingKey.NewUsersCheck, false) && update.Message.From != null;
         }
 
         protected override async Task<IUpdateHandlerResult> HandleUpdateInternal(Update update)
