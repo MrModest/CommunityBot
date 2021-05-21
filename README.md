@@ -10,4 +10,4 @@ New bot command can be implemented by inhering base class for this: [`BotCommand
 
 If you need more complex handle logic than simple bot command, you can inherit [`UpdateHandlerBase`](/CommunityBot/Handlers/UpdateHandlerBase.cs). For this you need override `AllowedUpdates`, `CanHandle` and similarly implement your handle logic.
 
-BotClient's sending methonds calling in [`BotService`](/CommunityBot/Services/BotService.cs) in method `SendResult` based on `IUpdateHandlerResult` (which returned by update handlers).
+BotClient's sending methonds calling in [`BotService`](/CommunityBot/Services/BotService.cs) in method `SendResult` based on [`IUpdateHandlerResult`](/CommunityBot/Handlers/Results) (which returned by update handlers).
