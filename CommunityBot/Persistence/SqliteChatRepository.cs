@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
@@ -27,17 +27,23 @@ namespace CommunityBot.Persistence
             return ExecuteAsync($"DELETE FROM {TableName} where {nameof(SavedChat.ExactName)} = @name", new { name });
         }
 
-        public async Task AddOrUpdate(SavedChat savedChat)
+        public async Task<bool> AddOrUpdate(SavedChat savedChat)
         {
             var existingEntity = await GetByName(savedChat.ExactName);
+            bool isUpdated;
+
             if (existingEntity is null)
             {
                 savedChat.Id = await Insert(savedChat);
+                isUpdated = false;
             }
             else
             {
                 await Update(savedChat);
+                isUpdated = true;
             }
+
+            return isUpdated;
         }
     }
 }

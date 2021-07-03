@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using CommunityBot.Contracts;
 using CommunityBot.Handlers.Results;
@@ -52,9 +52,10 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
             var chatName = arg[0];
             var chatLink = arg[1];
 
-            await _chatRepository.AddOrUpdate(new SavedChat(-1, chatName, chatLink));
+            var isUpdated = await _chatRepository.AddOrUpdate(new SavedChat(-1, chatName, chatLink));
+            var text = $"Ссылка на чат {(isUpdated ? "обновлена" : "добавлена")}! Спасибо за помощь боту!";
 
-            return Result.Text(update.Message.Chat.Id, "Чат добавлен/обновлён! Спасибо за помощь боту!", update.Message.MessageId);
+            return Result.Text(update.Message.Chat.Id, text, update.Message.MessageId);
         }
     }
 }
