@@ -40,7 +40,7 @@ namespace CommunityBot.Persistence
             else
             {
                 existingEntity.JoinLink = savedChat.JoinLink;
-                await Update(savedChat);
+                await Update(existingEntity);
                 isUpdated = true;
             }
 
