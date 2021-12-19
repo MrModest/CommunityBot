@@ -15,7 +15,7 @@ COPY --from=build /app/publish .
 
 ENV SQLite__DbFilePath /app/db/database.sqlite
 
-ENV ASPNETCORE_URLS https://+;http://+
+ENV ASPNETCORE_URLS http://+
 #ENV ASPNETCORE_HTTPS_PORT 5001 #ignored
 
 ENTRYPOINT ["dotnet", "CommunityBot.dll"]
