@@ -6,3 +6,4 @@ riderModule.iml
 appsettings.Production.json
 appsettings.Development.json
 env.*.list
+.DS_Store
