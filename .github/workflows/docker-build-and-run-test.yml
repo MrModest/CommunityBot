@@ -32,7 +32,7 @@ jobs:
         run: sleep 10s && docker logs communitybot-container
       
       - name: Check run status code
-        run: sh -c '[ $(curl -k -o -I -L -s -w "%{http_code}" https://localhost:443) -eq 200 ]'
+        run: sh -c '[ $(curl -k -o -I -L -s -w "%{http_code}" http://localhost:80) -eq 200 ]'
       
       - name: Check run
         run: curl -k -o - https://localhost:443
