@@ -41,7 +41,7 @@ namespace CommunityBot.Handlers.BotCommands.ChatManage
                     update.Message.MessageId);
             }
 
-            if (!arg[1].StartsWith("https://t.me/joinchat/") || !arg[1].StartsWith("https://t.me/+"))
+            if (!arg[1].StartsWith("https://t.me/joinchat/") && !arg[1].StartsWith("https://t.me/+"))
             {
                 return Result.Text(
                     update.Message.Chat.Id,
