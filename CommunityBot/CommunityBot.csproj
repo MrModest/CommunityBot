@@ -15,7 +15,7 @@
       <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" />
       <PackageReference Include="Serilog.Sinks.Telegram" Version="0.2.1" />
       <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
-      <PackageReference Include="Telegram.Bot" Version="15.7.1" />
+      <PackageReference Include="Telegram.Bot" Version="16.0.0" />
       <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
     </ItemGroup>
 
