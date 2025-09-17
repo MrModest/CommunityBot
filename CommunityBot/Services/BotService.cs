@@ -107,7 +107,7 @@ namespace CommunityBot.Services
             {
                 case TextUpdateHandlerResult textResult:
                     await _botClient.SendTextMessageAsync(textResult.ChatId, textResult.MessageText, 
-                        textResult.ParseMode, textResult.DisableWebPagePreview, replyToMessageId: textResult.ReplyToMessageId, replyMarkup: textResult.ReplyMarkup);
+                        parseMode: textResult.ParseMode, disableWebPagePreview: textResult.DisableWebPagePreview, replyToMessageId: textResult.ReplyToMessageId, replyMarkup: textResult.ReplyMarkup);
                     break;
                 
                 case PhotoUpdateHandlerResult photoResult:
@@ -121,13 +121,13 @@ namespace CommunityBot.Services
                     break;
                 
                 case MediaGroupUpdateHandlerResult mediaGroupResult:
-                    await _botClient.SendMediaGroupAsync(mediaGroupResult.MediaList, mediaGroupResult.ChatId, 
+                    await _botClient.SendMediaGroupAsync(mediaGroupResult.ChatId, mediaGroupResult.MediaList,
                         replyToMessageId: mediaGroupResult.ReplyToMessageId);
                     break;
                 
                 case DocumentUpdateHandlerResult documentResult:
-                    await _botClient.SendDocumentAsync(documentResult.ChatId, documentResult.File, documentResult.Caption, 
-                        documentResult.ParseMode, replyToMessageId: documentResult.ReplyToMessageId, replyMarkup: documentResult.ReplyMarkup);
+                    await _botClient.SendDocumentAsync(documentResult.ChatId, documentResult.File,
+                        caption: documentResult.Caption, parseMode: documentResult.ParseMode, replyToMessageId: documentResult.ReplyToMessageId, replyMarkup: documentResult.ReplyMarkup);
                     documentResult.Dispose();
                     break;
                 
