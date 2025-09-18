@@ -16,6 +16,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: libssl1.0.0 # to fix `No usable version of libssl was found`
+        version: 1.0
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v5
       with:
